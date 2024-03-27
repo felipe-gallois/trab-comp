@@ -1,0 +1,4 @@
+char int float code
+if else while input
+print return
+<= >= == !=
