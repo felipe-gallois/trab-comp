@@ -1,5 +1,7 @@
 // char
 char // int
+char /* char int
+float code */
 char int float code
 if else while input
 print return

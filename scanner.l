@@ -4,6 +4,8 @@
     static int running = 1;
 %}
 
+%x COMMENT
+
 %%
 
 "char"     { return KW_CHAR; }
@@ -29,9 +31,13 @@
 [0-9a-zA-Z\_]*[a-zA-Z\_][0-9a-zA-Z\_]*      { return TK_IDENTIFIER; } 
 
 "//".*
+"/*"        { BEGIN(COMMENT); }
 [ \t\n]
 
 .       { return TOKEN_ERROR; }
+
+<COMMENT>"*/"       { BEGIN(INITIAL); }
+<COMMENT>.|"\n"
 
 %%
 
