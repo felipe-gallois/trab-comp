@@ -18,7 +18,7 @@ int main(int argc, char** argv)
   int answar = 0;
   int nota = 0;
   int i=1;
-      fprintf(stderr,"Rodando main do prof. \n");
+  int line_number = 0;
 
   if (argc < 3)
     {
@@ -39,6 +39,11 @@ int main(int argc, char** argv)
   while (isRunning())
     {
     token = yylex();
+
+    while (getLineNumber() > line_number) {
+        fprintf(stderr, "LINE BREAK\n");
+        line_number++;
+    }
     
     if (!isRunning())
       break;
@@ -50,9 +55,10 @@ int main(int argc, char** argv)
       }
     else
       fprintf(stderr,"\n%d=ERROR(%s,%d,%d) ",i,yytext,token,answar );
+    fprintf(stderr, "\n");
     ++i;
     }
-  printf("NÚMERO DE LINHAS %d\n\n", getLineNumber());
+  printf("LINE COUNTER %d\n",line_number);
   printf("NOTA %d\n\n",nota);  
   fprintf(stderr,"NOTA %d\n\n",nota);  
   }
