@@ -4,7 +4,8 @@
     static int running = 1;
 %}
 
-%x COMMENT
+%x SINGLE_COMMENT
+%x MULTI_COMMENT
 
 %%
 
@@ -21,6 +22,15 @@
 "print"     { return KW_PRINT; }
 "return"     { return KW_RETURN; }
 
+"//"        { BEGIN(SINGLE_COMMENT); }
+<SINGLE_COMMENT>.
+<SINGLE_COMMENT>"\n"        { BEGIN(INITIAL); }
+
+"///"        { BEGIN(MULTI_COMMENT); }
+<MULTI_COMMENT>.
+<MULTI_COMMENT>"\n"
+<MULTI_COMMENT>"\\\\\\"       { BEGIN(INITIAL); }
+
 [-,;()\[\]{}=+*/%<>&|~]     { return yytext[0]; }
 
 "<="        { return OPERATOR_LE; }
@@ -30,14 +40,9 @@
 
 [0-9a-zA-Z\_]*[a-zA-Z\_][0-9a-zA-Z\_]*      { return TK_IDENTIFIER; } 
 
-"//".*
-"/*"        { BEGIN(COMMENT); }
 [ \t\n]
 
 .       { return TOKEN_ERROR; }
-
-<COMMENT>"*/"       { BEGIN(INITIAL); }
-<COMMENT>.|"\n"
 
 %%
 
