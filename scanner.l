@@ -38,6 +38,12 @@
 "=="        { return OPERATOR_EQ; }
 "!="        { return OPERATOR_DIF; }
 
+[0-9]+      { return LIT_INT; }
+
+[0-9]+"."[0-9]+     { return LIT_REAL; }
+[0-9]+"."       { return LIT_REAL; }
+"."[0-9]+     { return LIT_REAL; }
+
 [0-9a-zA-Z\_]*[a-zA-Z\_][0-9a-zA-Z\_]*      { return TK_IDENTIFIER; } 
 
 [ \t\n]
