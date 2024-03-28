@@ -1,5 +1,6 @@
 char int float code
 if else while input
 print return
+, ; ( ) [ ] { } = + - * / % < > & | ~
 <= >= == !=
 aAz _b0 A__ b 1
