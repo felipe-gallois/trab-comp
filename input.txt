@@ -1,3 +1,5 @@
+// char
+char // int
 char int float code
 if else while input
 print return
