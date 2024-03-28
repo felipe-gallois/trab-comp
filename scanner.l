@@ -9,29 +9,31 @@
 
 %%
 
+"bool"      { return KW_BOOL; }
 "char"     { return KW_CHAR; }
 "int"     { return KW_INT; }
 "float"     { return KW_FLOAT; }
 
-"code"     { return KW_CODE; }
-
 "if"     { return KW_IF; }
 "else"     { return KW_ELSE; }
 "while"     { return KW_WHILE; }
-"input"     { return KW_INPUT; }
+"read"     { return KW_READ; }
 "print"     { return KW_PRINT; }
 "return"     { return KW_RETURN; }
+
+"false"     { return LIT_FALSE; }
+"true"      { return LIT_TRUE; }
 
 "//"        { BEGIN(SINGLE_COMMENT); }
 <SINGLE_COMMENT>.
 <SINGLE_COMMENT>"\n"        { BEGIN(INITIAL); }
 
-"///"        { BEGIN(MULTI_COMMENT); }
+"/*"        { BEGIN(MULTI_COMMENT); }
 <MULTI_COMMENT>.
 <MULTI_COMMENT>"\n"
-<MULTI_COMMENT>"\\\\\\"       { BEGIN(INITIAL); }
+<MULTI_COMMENT>"*/"       { BEGIN(INITIAL); }
 
-[-,;()\[\]{}=+*/%<>&|~]     { return yytext[0]; }
+[-,;:()\[\]{}=+*/%<>&|~]     { return yytext[0]; }
 
 "<="        { return OPERATOR_LE; }
 ">="        { return OPERATOR_GE; }
@@ -44,7 +46,11 @@
 [0-9]+"."       { return LIT_REAL; }
 "."[0-9]+     { return LIT_REAL; }
 
-[0-9a-zA-Z\_]*[a-zA-Z\_][0-9a-zA-Z\_]*      { return TK_IDENTIFIER; } 
+"\'"."\'"       { return LIT_CHAR; } 
+
+"\""[^\n"]*"\""     { return LIT_STRING; }
+
+[a-zA-Z\_][0-9a-zA-Z\_]*      { return TK_IDENTIFIER; } 
 
 [ \t\n]
 
