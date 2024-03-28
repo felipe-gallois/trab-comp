@@ -2,6 +2,7 @@
     #include "tokens.h"
 
     static int running = 1;
+    static int line_number = 0;
 %}
 
 %x SINGLE_COMMENT
@@ -26,11 +27,11 @@
 
 "//"        { BEGIN(SINGLE_COMMENT); }
 <SINGLE_COMMENT>.
-<SINGLE_COMMENT>"\n"        { BEGIN(INITIAL); }
+<SINGLE_COMMENT>"\n"        { ++line_number; BEGIN(INITIAL); }
 
 "/*"        { BEGIN(MULTI_COMMENT); }
 <MULTI_COMMENT>.
-<MULTI_COMMENT>"\n"
+<MULTI_COMMENT>"\n"     { ++line_number; }
 <MULTI_COMMENT>"*/"       { BEGIN(INITIAL); }
 
 [-,;:()\[\]{}=+*/%<>&|~]     { return yytext[0]; }
@@ -52,7 +53,9 @@
 
 [a-zA-Z\_][0-9a-zA-Z\_]*      { return TK_IDENTIFIER; } 
 
-[ \t\n]
+[ \t]
+
+"\n"        { ++line_number; }
 
 .       { return TOKEN_ERROR; }
 
@@ -69,4 +72,8 @@ int isRunning() {
 
 void initMe() {
    return;
+}
+
+int getLineNumber() {
+    return line_number;
 }

@@ -9,6 +9,7 @@ extern FILE *yyin;
 
 int isRunning(void);
 void initMe(void);
+int getLineNumber(void);
 
 int main(int argc, char** argv)
   {
@@ -51,6 +52,7 @@ int main(int argc, char** argv)
       fprintf(stderr,"\n%d=ERROR(%s,%d,%d) ",i,yytext,token,answar );
     ++i;
     }
+  printf("NÚMERO DE LINHAS %d\n\n", getLineNumber());
   printf("NOTA %d\n\n",nota);  
   fprintf(stderr,"NOTA %d\n\n",nota);  
   }
