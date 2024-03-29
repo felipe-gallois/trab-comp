@@ -5,11 +5,14 @@
 # do trabalho. 
 #
 
-etapa1: lex.yy.o main.o
-	gcc -o etapa1 lex.yy.o main.o
+etapa1: lex.yy.o hash.o main.o
+	gcc -o etapa1 lex.yy.o hash.o main.o
 
 main.o: main.c
 	gcc -c main.c
+
+hash.o: hash.c
+	gcc -c hash.c
 
 lex.yy.o: lex.yy.c
 	gcc -c lex.yy.c

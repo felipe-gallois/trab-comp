@@ -1,5 +1,6 @@
 %{
     #include "tokens.h"
+    #include "hash.h"
 
     static int running = 1;
     static int line_number = 0;
@@ -41,17 +42,18 @@
 "=="        { return OPERATOR_EQ; }
 "!="        { return OPERATOR_DIF; }
 
-[0-9]+      { return LIT_INT; }
+[0-9]+      { insert_entry(yytext, LIT_INT); return LIT_INT; }
 
-[0-9]+"."[0-9]+     { return LIT_REAL; }
-[0-9]+"."       { return LIT_REAL; }
-"."[0-9]+     { return LIT_REAL; }
+[0-9]+"."[0-9]+     { insert_entry(yytext, LIT_REAL); return LIT_REAL; }
+[0-9]+"."       { insert_entry(yytext, LIT_REAL); return LIT_REAL; }
+"."[0-9]+     { insert_entry(yytext, LIT_REAL); return LIT_REAL; }
 
-"\'"."\'"       { return LIT_CHAR; } 
+"\'"."\'"       { insert_entry(yytext, LIT_CHAR); return LIT_CHAR; } 
 
-"\""[^\n"]*"\""     { return LIT_STRING; }
+"\""[^\n"]*"\""     { insert_entry(yytext, LIT_STRING); return LIT_STRING; }
 
-[a-zA-Z\_][0-9a-zA-Z\_]*      { return TK_IDENTIFIER; } 
+[a-zA-Z\_][0-9a-zA-Z\_]*      { insert_entry(yytext, TK_IDENTIFIER);
+                                return TK_IDENTIFIER; } 
 
 [ \t]
 
@@ -62,16 +64,17 @@
 %%
 
 int yywrap() {
-   running = 0;
-   return 1;
+    running = 0;
+    return 1;
 }
 
 int isRunning() {
-   return running; 
+    return running; 
 }
 
 void initMe() {
-   return;
+    hash_init();     
+    return;
 }
 
 int getLineNumber() {

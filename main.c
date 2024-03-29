@@ -11,6 +11,8 @@ int isRunning(void);
 void initMe(void);
 int getLineNumber(void);
 
+void print_hash();
+
 int main(int argc, char** argv)
   {
   FILE *gold = 0;
@@ -61,5 +63,6 @@ int main(int argc, char** argv)
   printf("LINE COUNTER %d\n",line_number);
   printf("NOTA %d\n\n",nota);  
   fprintf(stderr,"NOTA %d\n\n",nota);  
+  print_hash();
   }
 
