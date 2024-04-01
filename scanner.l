@@ -9,6 +9,8 @@
 %x SINGLE_COMMENT
 %x MULTI_COMMENT
 
+ESCAPE_SEQ "\\n"|"\\\""
+
 %%
 
 "bool"      { return KW_BOOL; }
@@ -48,9 +50,11 @@
 [0-9]+"."       { insert_entry(yytext, LIT_REAL); return LIT_REAL; }
 "."[0-9]+     { insert_entry(yytext, LIT_REAL); return LIT_REAL; }
 
-"\'"."\'"       { insert_entry(yytext, LIT_CHAR); return LIT_CHAR; } 
+"\'"(.|{ESCAPE_SEQ})"\'"       { insert_entry(yytext, LIT_CHAR);
+                                 return LIT_CHAR; } 
 
-"\""[^\n"]*"\""     { insert_entry(yytext, LIT_STRING); return LIT_STRING; }
+"\""([^\n"]|{ESCAPE_SEQ})*"\""     { insert_entry(yytext, LIT_STRING);
+                                     return LIT_STRING; }
 
 [a-zA-Z\_][0-9a-zA-Z\_]*      { insert_entry(yytext, TK_IDENTIFIER);
                                 return TK_IDENTIFIER; } 

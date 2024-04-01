@@ -11,3 +11,5 @@ false true
 aAz _b0 A__ b 1
 999 99.0 9. .9 .
 read "char int""if" 'a'
+"bool \n" "bool \""
+'\n' '\"'
