@@ -20,7 +20,7 @@ int main(int argc, char** argv)
   int answar = 0;
   int nota = 0;
   int i=1;
-  int line_number = 0;
+  int line_number = 1;
 
   if (argc < 3)
     {
@@ -60,7 +60,6 @@ int main(int argc, char** argv)
     fprintf(stderr, "\n");
     ++i;
     }
-  printf("LINE COUNTER %d\n",line_number);
   printf("NOTA %d\n\n",nota);  
   fprintf(stderr,"NOTA %d\n\n",nota);  
   print_hash();

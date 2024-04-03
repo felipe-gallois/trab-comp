@@ -3,7 +3,7 @@
     #include "hash.h"
 
     static int running = 1;
-    static int line_number = 0;
+    static int line_number = 1;
 %}
 
 %x SINGLE_COMMENT
