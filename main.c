@@ -1,67 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//lex.yy.h
-int yylex();
-extern char *yytext;
+#include "hash.h"
+
 extern FILE *yyin;
 
+void yyparse();
+void initMe();
 
-int isRunning(void);
-void initMe(void);
-int getLineNumber(void);
+int main(int argc, char** argv) {
+    if (argc < 2) {
+        printf("call: ./etapa2 input.txt\n");
+        exit(1);
+    }
 
-void print_hash();
+    if (0==(yyin = fopen(argv[1],"r"))) {
+        printf("Cannot open file %s... \n",argv[1]);
+        exit(1);
+    }
 
-int main(int argc, char** argv)
-  {
-  FILE *gold = 0;
-  int token = 0;
-  int answar = 0;
-  int nota = 0;
-  int i=1;
-  int line_number = 1;
-
-  if (argc < 3)
-    {
-    printf("call: ./etapa1 input.txt output.txt \n");
-    exit(1);
-    }
-  if (0==(yyin = fopen(argv[1],"r")))
-    {
-    printf("Cannot open file %s... \n",argv[1]);
-    exit(1);
-    }
-  if (0==(gold = fopen(argv[2],"r")))
-    {
-    printf("Cannot open file %s... \n",argv[2]);
-    exit(1);
-    }
-  initMe();
-  while (isRunning())
-    {
-    token = yylex();
-
-    while (getLineNumber() > line_number) {
-        fprintf(stderr, "LINE BREAK\n");
-        line_number++;
-    }
-    
-    if (!isRunning())
-      break;
-    fscanf(gold,"%d",&answar);
-    if (token == answar)
-      {
-      fprintf(stderr,"%d=ok(%s)  ",i,yytext  );
-      ++nota;
-      }
-    else
-      fprintf(stderr,"\n%d=ERROR(%s,%d,%d) ",i,yytext,token,answar );
-    fprintf(stderr, "\n");
-    ++i;
-    }
-  printf("NOTA %d\n\n",nota);  
-  fprintf(stderr,"NOTA %d\n\n",nota);  
-  print_hash();
-  }
+    initMe();
+    yyparse();
+    print_hash();
+}
 

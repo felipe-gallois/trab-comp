@@ -1,9 +1,9 @@
 %{
-    #include "tokens.h"
-    #include "hash.h"
+#include "y.tab.h"
+#include "hash.h"
 
-    static int running = 1;
-    static int line_number = 1;
+static int running = 1;
+static int line_number = 1;
 %}
 
 %x SINGLE_COMMENT
