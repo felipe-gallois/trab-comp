@@ -37,9 +37,32 @@ int getLineNumber();
 
 %%
 
-programa: TK_IDENTIFIER
-        | LIT_INT
+program: commands
+       ;
+
+commands: command commands
+        |
         ;
+
+command: variable_declaration
+       ;
+
+variable_declaration: type TK_IDENTIFIER':'literal';'
+                    ;
+
+type: KW_CHAR
+    | KW_INT
+    | KW_FLOAT
+    | KW_BOOL
+    ;
+
+literal: LIT_INT
+       | LIT_CHAR
+       | LIT_REAL
+       | LIT_FALSE
+       | LIT_TRUE
+       | LIT_STRING
+       ;
 
 %%
 

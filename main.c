@@ -22,5 +22,7 @@ int main(int argc, char** argv) {
     initMe();
     yyparse();
     print_hash();
+
+    exit(0);
 }
 
