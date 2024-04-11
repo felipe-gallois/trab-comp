@@ -45,16 +45,19 @@ commands: command commands
         ;
 
 command: variable_declaration
+       | vector_declaration
        ;
 
 variable_declaration: type TK_IDENTIFIER':'literal';'
                     ;
 
-type: KW_CHAR
-    | KW_INT
-    | KW_FLOAT
-    | KW_BOOL
-    ;
+vector_declaration: type TK_IDENTIFIER'['LIT_INT']'';'
+                  | type TK_IDENTIFIER'['LIT_INT']'':' literal_list';'
+                  ;
+
+literal_list: literal
+            | literal literal_list
+            ;
 
 literal: LIT_INT
        | LIT_CHAR
@@ -63,6 +66,12 @@ literal: LIT_INT
        | LIT_TRUE
        | LIT_STRING
        ;
+
+type: KW_CHAR
+    | KW_INT
+    | KW_FLOAT
+    | KW_BOOL
+    ;
 
 %%
 
