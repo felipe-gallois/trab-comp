@@ -40,12 +40,16 @@ int getLineNumber();
 program: commands
        ;
 
+command_block: '{'commands'}'
+
 commands: command commands
         |
         ;
 
 command: variable_declaration
        | vector_declaration
+       | function_declaration
+       | command_block
        ;
 
 variable_declaration: type TK_IDENTIFIER':'literal';'
@@ -55,9 +59,25 @@ vector_declaration: type TK_IDENTIFIER'['LIT_INT']'';'
                   | type TK_IDENTIFIER'['LIT_INT']'':' literal_list';'
                   ;
 
+function_declaration: type TK_IDENTIFIER '('args_list')' command_block
+                    ;
+
 literal_list: literal
             | literal literal_list
             ;
+
+args_list: 
+         | argument args_list
+         ;
+
+argument: type TK_IDENTIFIER
+        ;
+
+type: KW_CHAR
+    | KW_INT
+    | KW_FLOAT
+    | KW_BOOL
+    ;
 
 literal: LIT_INT
        | LIT_CHAR
@@ -66,12 +86,6 @@ literal: LIT_INT
        | LIT_TRUE
        | LIT_STRING
        ;
-
-type: KW_CHAR
-    | KW_INT
-    | KW_FLOAT
-    | KW_BOOL
-    ;
 
 %%
 
