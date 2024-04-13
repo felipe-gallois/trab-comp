@@ -49,6 +49,7 @@ program: commands
        ;
 
 command_block: '{'commands'}'
+             ;
 
 commands: command commands
         |
@@ -74,6 +75,7 @@ variable_attribution: TK_IDENTIFIER '=' expr';'
                     ;
 
 vector_attribution: TK_IDENTIFIER'['expr']' '=' expr';'
+                  ;
 
 function_declaration: type TK_IDENTIFIER '('param_list')' command_block
                     ;
