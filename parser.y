@@ -60,6 +60,9 @@ command: empty_command
        | vector_declaration
        | variable_attribution
        | vector_attribution
+       | read_command
+       | print_command
+       | return_command
        | function_declaration
        | command_block
        ;
@@ -76,6 +79,16 @@ variable_attribution: TK_IDENTIFIER '=' expr';'
 
 vector_attribution: TK_IDENTIFIER'['expr']' '=' expr';'
                   ;
+
+read_command: KW_READ type expr';'
+            ;
+
+print_command: KW_PRINT expr';'
+             | KW_PRINT type expr';'
+             ;
+
+return_command: KW_RETURN expr';'
+              ;
 
 function_declaration: type TK_IDENTIFIER '('param_list')' command_block
                     ;
