@@ -35,6 +35,14 @@ int getLineNumber();
 
 %token TOKEN_ERROR
 
+%left '|'
+%left '&'
+%left OPERATOR_EQ OPERATOR_DIF
+%left '>' OPERATOR_GE '<' OPERATOR_LE
+%left '+' '-'
+%left '*' '/'
+%left '~'
+
 %%
 
 program: commands
@@ -46,8 +54,11 @@ commands: command commands
         |
         ;
 
-command: variable_declaration
+command: empty_command
+       | variable_declaration
        | vector_declaration
+       | variable_attribution
+       | vector_attribution
        | function_declaration
        | command_block
        ;
@@ -59,19 +70,57 @@ vector_declaration: type TK_IDENTIFIER'['LIT_INT']'';'
                   | type TK_IDENTIFIER'['LIT_INT']'':' literal_list';'
                   ;
 
-function_declaration: type TK_IDENTIFIER '('args_list')' command_block
+variable_attribution: TK_IDENTIFIER '=' expr';'
                     ;
+
+vector_attribution: TK_IDENTIFIER'['expr']' '=' expr';'
+
+function_declaration: type TK_IDENTIFIER '('param_list')' command_block
+                    ;
+
+expr: literal
+    | TK_IDENTIFIER
+    | TK_IDENTIFIER'['expr']'
+    | TK_IDENTIFIER'('args_list')'
+    | '('expr')'
+    | expr '+' expr
+    | expr '-' expr
+    | expr '*' expr
+    | expr '/' expr
+    | expr '<' expr
+    | expr '>' expr
+    | expr OPERATOR_LE expr
+    | expr OPERATOR_GE expr
+    | expr OPERATOR_EQ expr
+    | expr OPERATOR_DIF expr
+    | expr '&' expr
+    | expr '|' expr
+    | expr '~' expr
+    ;
 
 literal_list: literal
             | literal literal_list
             ;
 
-args_list: 
-         | argument args_list
+param_list: 
+          | param param_list
+          ;
+
+args_list: arg args_l
          ;
 
-argument: type TK_IDENTIFIER
-        ;
+args_l:
+      | ','arg args_l
+      ;
+
+param: type TK_IDENTIFIER
+     ;
+
+arg: expr
+   ;
+
+empty_command: ';'
+             ;
 
 type: KW_CHAR
     | KW_INT
