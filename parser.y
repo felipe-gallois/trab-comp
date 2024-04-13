@@ -63,6 +63,8 @@ command: empty_command
        | read_command
        | print_command
        | return_command
+       | if_expr
+       | while_expr
        | function_declaration
        | command_block
        ;
@@ -89,6 +91,13 @@ print_command: KW_PRINT expr';'
 
 return_command: KW_RETURN expr';'
               ;
+
+if_expr: KW_IF '('expr')' command
+       | KW_IF '('expr')' command KW_ELSE command
+       ;
+
+while_expr: KW_WHILE '('expr')' command
+          ;
 
 function_declaration: type TK_IDENTIFIER '('param_list')' command_block
                     ;
