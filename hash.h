@@ -3,6 +3,16 @@
 
 #define HASH_SIZE 997
 
+enum SymbolType {
+    SYMBOL_TK_IDENTIFIER,
+    SYMBOL_LIT_INT,
+    SYMBOL_LIT_CHAR,
+    SYMBOL_LIT_REAL,
+    SYMBOL_LIT_FALSE,
+    SYMBOL_LIT_TRUE,
+    SYMBOL_LIT_STRING
+};
+
 typedef struct HashEntry {
     int type;
     char *string;

@@ -44,19 +44,19 @@ ESCAPE_SEQ "\\n"|"\\\""
 "=="        { return OPERATOR_EQ; }
 "!="        { return OPERATOR_DIF; }
 
-[0-9]+      { insert_entry(yytext, LIT_INT); return LIT_INT; }
+[0-9]+      { insert_entry(yytext, SYMBOL_LIT_INT); return LIT_INT; }
 
-[0-9]+"."[0-9]+     { insert_entry(yytext, LIT_REAL); return LIT_REAL; }
-[0-9]+"."       { insert_entry(yytext, LIT_REAL); return LIT_REAL; }
-"."[0-9]+     { insert_entry(yytext, LIT_REAL); return LIT_REAL; }
+[0-9]+"."[0-9]+     { insert_entry(yytext, SYMBOL_LIT_REAL); return LIT_REAL; }
+[0-9]+"."       { insert_entry(yytext, SYMBOL_LIT_REAL); return LIT_REAL; }
+"."[0-9]+     { insert_entry(yytext, SYMBOL_LIT_REAL); return LIT_REAL; }
 
-"\'"(.|{ESCAPE_SEQ})"\'"       { insert_entry(yytext, LIT_CHAR);
+"\'"(.|{ESCAPE_SEQ})"\'"       { insert_entry(yytext, SYMBOL_LIT_CHAR);
                                  return LIT_CHAR; } 
 
-"\""([^\n"]|{ESCAPE_SEQ})*"\""     { insert_entry(yytext, LIT_STRING);
+"\""([^\n"]|{ESCAPE_SEQ})*"\""     { insert_entry(yytext, SYMBOL_LIT_STRING);
                                      return LIT_STRING; }
 
-[a-zA-Z\_][0-9a-zA-Z\_]*      { insert_entry(yytext, TK_IDENTIFIER);
+[a-zA-Z\_][0-9a-zA-Z\_]*      { insert_entry(yytext, SYMBOL_TK_IDENTIFIER);
                                 return TK_IDENTIFIER; } 
 
 [ \t]
