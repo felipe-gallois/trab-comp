@@ -127,11 +127,15 @@ literal_list: literal
             ;
 
 param_list: 
-          | param param_list
+          | param param_l
           ;
 
 args_list: arg args_l
          ;
+
+param_l:
+       | ','param param_l
+       ;
 
 args_l:
       | ','arg args_l
