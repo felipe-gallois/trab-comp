@@ -1,4 +1,6 @@
 %{
+// UFRGS - Compiladores - Felipe Gallois - 2024/1
+
 #include "y.tab.h"
 #include "hash.h"
 

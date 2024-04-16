@@ -1,4 +1,6 @@
 %{
+// UFRGS - Compiladores - Felipe Gallois - 2024/1
+
 #include <stdlib.h>
 #include <stdio.h>
 

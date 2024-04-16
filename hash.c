@@ -1,3 +1,5 @@
+// UFRGS - Compiladores - Felipe Gallois - 2024/1
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>

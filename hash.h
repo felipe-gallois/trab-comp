@@ -1,3 +1,5 @@
+// UFRGS - Compiladores - Felipe Gallois - 2024/1
+
 #ifndef HASH_H
 #define HASH_H
 
