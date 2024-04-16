@@ -47,29 +47,17 @@ int getLineNumber();
 
 %%
 
-program: commands
+program: declarations
        ;
 
-command_block: '{'commands'}'
-             ;
+declarations:
+            | declaration declarations
+            ;
 
-commands: command commands
-        |
-        ;
-
-command: empty_command
-       | variable_declaration
-       | vector_declaration
-       | variable_attribution
-       | vector_attribution
-       | read_command
-       | print_command
-       | return_command
-       | if_expr
-       | while_expr
-       | function_declaration
-       | command_block
-       ;
+declaration: variable_declaration
+           | vector_declaration
+           | function_declaration
+           ;
 
 variable_declaration: type TK_IDENTIFIER':'literal';'
                     ;
@@ -77,6 +65,27 @@ variable_declaration: type TK_IDENTIFIER':'literal';'
 vector_declaration: type TK_IDENTIFIER'['LIT_INT']'';'
                   | type TK_IDENTIFIER'['LIT_INT']'':' literal_list';'
                   ;
+
+function_declaration: type TK_IDENTIFIER '('param_list')' command_block
+                    ;
+
+command_block: '{'commands'}'
+             ;
+
+commands:
+        | command commands
+        ;
+
+command: empty_command
+       | variable_attribution
+       | vector_attribution
+       | read_command
+       | print_command
+       | return_command
+       | if_expr
+       | while_expr
+       | command_block
+       ;
 
 variable_attribution: TK_IDENTIFIER '=' expr';'
                     ;
@@ -100,9 +109,6 @@ if_expr: KW_IF '('expr')' command
 
 while_expr: KW_WHILE '('expr')' command
           ;
-
-function_declaration: type TK_IDENTIFIER '('param_list')' command_block
-                    ;
 
 expr: literal
     | TK_IDENTIFIER
