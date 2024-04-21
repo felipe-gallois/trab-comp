@@ -1,8 +1,9 @@
 %{
 // UFRGS - Compiladores - Felipe Gallois - 2024/1
 
-#include "y.tab.h"
 #include "hash.h"
+#include "ast.h"
+#include "y.tab.h"
 
 static int running = 1;
 static int line_number = 1;
@@ -27,8 +28,10 @@ ESCAPE_SEQ "\\n"|"\\\""
 "print"     { return KW_PRINT; }
 "return"     { return KW_RETURN; }
 
-"false"     { return LIT_FALSE; }
-"true"      { return LIT_TRUE; }
+"false"     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_BOOL);
+              return LIT_FALSE; }
+"true"      { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_BOOL);
+              return LIT_TRUE; }
 
 "//"        { BEGIN(SINGLE_COMMENT); }
 <SINGLE_COMMENT>.
@@ -46,19 +49,23 @@ ESCAPE_SEQ "\\n"|"\\\""
 "=="        { return OPERATOR_EQ; }
 "!="        { return OPERATOR_DIF; }
 
-[0-9]+      { insert_entry(yytext, SYMBOL_LIT_INT); return LIT_INT; }
+[0-9]+      { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_INT);
+              return LIT_INT; }
 
-[0-9]+"."[0-9]+     { insert_entry(yytext, SYMBOL_LIT_REAL); return LIT_REAL; }
-[0-9]+"."       { insert_entry(yytext, SYMBOL_LIT_REAL); return LIT_REAL; }
-"."[0-9]+     { insert_entry(yytext, SYMBOL_LIT_REAL); return LIT_REAL; }
+[0-9]+"."[0-9]+     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_REAL);
+                      return LIT_REAL; }
+[0-9]+"."       { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_REAL);
+                  return LIT_REAL; }
+"."[0-9]+     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_REAL);
+                return LIT_REAL; }
 
-"\'"(.|{ESCAPE_SEQ})"\'"       { insert_entry(yytext, SYMBOL_LIT_CHAR);
+"\'"(.|{ESCAPE_SEQ})"\'"       { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_CHAR);
                                  return LIT_CHAR; } 
 
-"\""([^\n"]|{ESCAPE_SEQ})*"\""     { insert_entry(yytext, SYMBOL_LIT_STRING);
+"\""([^\n"]|{ESCAPE_SEQ})*"\""     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_STRING);
                                      return LIT_STRING; }
 
-[a-zA-Z\_][0-9a-zA-Z\_]*      { insert_entry(yytext, SYMBOL_TK_IDENTIFIER);
+[a-zA-Z\_][0-9a-zA-Z\_]*      { yylval.hash_entry = insert_entry(yytext, SYMBOL_TK_IDENTIFIER);
                                 return TK_IDENTIFIER; } 
 
 [ \t]

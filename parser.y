@@ -4,10 +4,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "hash.h"
+#include "ast.h"
+
 int yylex();
 int yyerror();
 int getLineNumber();
 %}
+
+%union {
+HashEntry *hash_entry;
+AstNode *ast_node;
+}
 
 %token KW_CHAR
 %token KW_INT
@@ -26,16 +34,20 @@ int getLineNumber();
 %token OPERATOR_EQ
 %token OPERATOR_DIF
 
-%token TK_IDENTIFIER
+%token<hash_entry> TK_IDENTIFIER
 
-%token LIT_INT
-%token LIT_CHAR
-%token LIT_REAL
-%token LIT_FALSE
-%token LIT_TRUE
-%token LIT_STRING
+%token<hash_entry> LIT_INT
+%token<hash_entry> LIT_CHAR
+%token<hash_entry> LIT_REAL
+%token<hash_entry> LIT_FALSE
+%token<hash_entry> LIT_TRUE
+%token<hash_entry> LIT_STRING
 
 %token TOKEN_ERROR
+
+%type<ast_node> identifier
+%type<ast_node> literal
+%type<ast_node> expr
 
 %left '|'
 %left '&'
@@ -59,14 +71,14 @@ declaration: variable_declaration
            | function_declaration
            ;
 
-variable_declaration: type TK_IDENTIFIER':'literal';'
+variable_declaration: type identifier':'literal';'
                     ;
 
-vector_declaration: type TK_IDENTIFIER'['LIT_INT']'';'
-                  | type TK_IDENTIFIER'['LIT_INT']'':' literal_list';'
+vector_declaration: type identifier'['literal']'';'
+                  | type identifier'['literal']'':' literal_list';'
                   ;
 
-function_declaration: type TK_IDENTIFIER '('param_list')' command_block
+function_declaration: type identifier '('param_list')' command_block
                     ;
 
 command_block: '{'commands'}'
@@ -87,10 +99,10 @@ command: empty_command
        | command_block
        ;
 
-variable_attribution: TK_IDENTIFIER '=' expr';'
+variable_attribution: identifier '=' expr';'
                     ;
 
-vector_attribution: TK_IDENTIFIER'['expr']' '=' expr';'
+vector_attribution: identifier'['expr']' '=' expr';'
                   ;
 
 read_command: KW_READ type expr';'
@@ -110,24 +122,24 @@ if_expr: KW_IF '('expr')' command
 while_expr: KW_WHILE '('expr')' command
           ;
 
-expr: literal
-    | TK_IDENTIFIER
-    | TK_IDENTIFIER'['expr']'
-    | TK_IDENTIFIER'('args_list')'
-    | '('expr')'
-    | expr '+' expr
-    | expr '-' expr
-    | expr '*' expr
-    | expr '/' expr
-    | expr '<' expr
-    | expr '>' expr
-    | expr OPERATOR_LE expr
-    | expr OPERATOR_GE expr
-    | expr OPERATOR_EQ expr
-    | expr OPERATOR_DIF expr
-    | expr '&' expr
-    | expr '|' expr
-    | expr '~' expr
+expr: literal       { $$ = $1; }
+    | identifier     { $$ = $1; }
+    | identifier'['expr']'       { $$ = 0; }
+    | identifier'('args_list')'      { $$ = 0; }
+    | '('expr')'        { $$ = 0; }
+    | expr '+' expr     { $$ = 0; }
+    | expr '-' expr     { $$ = 0; }
+    | expr '*' expr     { $$ = 0; }
+    | expr '/' expr     { $$ = 0; }
+    | expr '<' expr     { $$ = 0; }
+    | expr '>' expr     { $$ = 0; }
+    | expr OPERATOR_LE expr     { $$ = 0; }
+    | expr OPERATOR_GE expr     { $$ = 0; }
+    | expr OPERATOR_EQ expr     { $$ = 0; }
+    | expr OPERATOR_DIF expr        { $$ = 0; }
+    | expr '&' expr     { $$ = 0; }
+    | expr '|' expr     { $$ = 0; }
+    | expr '~' expr     { $$ = 0; }
     ;
 
 literal_list: literal
@@ -149,7 +161,7 @@ args_l:
       | ','arg args_l
       ;
 
-param: type TK_IDENTIFIER
+param: type identifier
      ;
 
 arg: expr
@@ -164,12 +176,15 @@ type: KW_CHAR
     | KW_BOOL
     ;
 
-literal: LIT_INT
-       | LIT_CHAR
-       | LIT_REAL
-       | LIT_FALSE
-       | LIT_TRUE
-       | LIT_STRING
+identifier: TK_IDENTIFIER       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
+          ;
+
+literal: LIT_INT        { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
+       | LIT_CHAR       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
+       | LIT_REAL       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
+       | LIT_FALSE      { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
+       | LIT_TRUE       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
+       | LIT_STRING     { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
        ;
 
 %%

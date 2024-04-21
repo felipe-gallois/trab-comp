@@ -1,24 +1,24 @@
 #
-# UFRGS - Compiladores - Felipe Gallois - 2024/1 - Etapa 1
+# UFRGS - Compiladores - Felipe Gallois - 2024/1
 #
-# Este arquivo define as receitas relacionadas à compilação do lexer da etapa 1
-# do trabalho. 
+# Este arquivo define as receitas relacionadas à compilação do lexer
 #
 
-etapa2: y.tab.o lex.yy.o hash.o main.o
-	gcc -o etapa2 y.tab.o lex.yy.o hash.o main.o
+CC = gcc
+CFLAGS = -Wall
 
-main.o: main.c
-	gcc -c -Wall main.c
+SRC1 = y.tab.c lex.yy.c
+SRC2 = hash.c ast.c main.c
+SRC = $(SRC1) $(SRC2)
 
-hash.o: hash.c
-	gcc -c -Wall hash.c
+OBJS = $(SRC:.c=.o)
 
-lex.yy.o: lex.yy.c
-	gcc -c -Wall lex.yy.c
+AUX1 = $(SRC1:.c=.h)
 
-y.tab.o: y.tab.c
-	gcc -c -Wall y.tab.c
+BIN = etapa3
+
+$(BIN): $(OBJS)
+	$(CC) -o $(BIN) $(OBJS)
 	
 lex.yy.c: scanner.l
 	flex --header-file=lex.yy.h scanner.l 
@@ -26,5 +26,6 @@ lex.yy.c: scanner.l
 y.tab.c: parser.y
 	yacc -d parser.y
 
+.PHONY: clean
 clean:
-	rm *.o y.tab.c lex.yy.c y.tab.h lex.yy.h etapa2
+	rm $(OBJS) $(SRC1) $(AUX1) $(BIN)
