@@ -40,10 +40,10 @@ int getLineNumber();
 %left '|'
 %left '&'
 %left OPERATOR_EQ OPERATOR_DIF
-%left '>' OPERATOR_GE '<' OPERATOR_LE
+%nonassoc '>' OPERATOR_GE '<' OPERATOR_LE
 %left '+' '-'
 %left '*' '/'
-%left '~'
+%nonassoc '~'
 
 %%
 
