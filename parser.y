@@ -48,6 +48,9 @@ AstNode *ast_node;
 %type<ast_node> identifier
 %type<ast_node> literal
 %type<ast_node> expr
+%type<ast_node> arg
+%type<ast_node> args_l
+%type<ast_node> args_list
 
 %left '|'
 %left '&'
@@ -99,47 +102,47 @@ command: empty_command
        | command_block
        ;
 
-variable_attribution: identifier '=' expr';'
+variable_attribution: identifier '=' expr';'        { ast_print($3, 0); }
                     ;
 
-vector_attribution: identifier'['expr']' '=' expr';'
+vector_attribution: identifier'['expr']' '=' expr';'        { ast_print($3, 0); ast_print($6, 0); }
                   ;
 
-read_command: KW_READ type expr';'
+read_command: KW_READ type expr';'      { ast_print($3, 0); }
             ;
 
-print_command: KW_PRINT expr';'
-             | KW_PRINT type expr';'
+print_command: KW_PRINT expr';'     { ast_print($2, 0); }
+             | KW_PRINT type expr';'        { ast_print($3, 0); }
              ;
 
-return_command: KW_RETURN expr';'
+return_command: KW_RETURN expr';'       { ast_print($2, 0); }
               ;
 
-if_expr: KW_IF '('expr')' command
-       | KW_IF '('expr')' command KW_ELSE command
+if_expr: KW_IF '('expr')' command       { ast_print($3, 0); }
+       | KW_IF '('expr')' command KW_ELSE command       { ast_print($3, 0); }
        ;
 
-while_expr: KW_WHILE '('expr')' command
+while_expr: KW_WHILE '('expr')' command     { ast_print($3, 0); }
           ;
 
 expr: literal       { $$ = $1; }
     | identifier     { $$ = $1; }
-    | identifier'['expr']'       { $$ = 0; }
-    | identifier'('args_list')'      { $$ = 0; }
-    | '('expr')'        { $$ = 0; }
-    | expr '+' expr     { $$ = 0; }
-    | expr '-' expr     { $$ = 0; }
-    | expr '*' expr     { $$ = 0; }
-    | expr '/' expr     { $$ = 0; }
-    | expr '<' expr     { $$ = 0; }
-    | expr '>' expr     { $$ = 0; }
-    | expr OPERATOR_LE expr     { $$ = 0; }
-    | expr OPERATOR_GE expr     { $$ = 0; }
-    | expr OPERATOR_EQ expr     { $$ = 0; }
-    | expr OPERATOR_DIF expr        { $$ = 0; }
-    | expr '&' expr     { $$ = 0; }
-    | expr '|' expr     { $$ = 0; }
-    | expr '~' expr     { $$ = 0; }
+    | identifier'['expr']'       { $$ = ast_create(AST_VEC_EXP, 0, $1, $3, 0, 0); }
+    | identifier'('args_list')'      { $$ = ast_create(AST_FUNC_EXP, 0, $1, $3, 0, 0); }
+    | '('expr')'        { $$ = $2; }
+    | expr '+' expr     { $$ = ast_create(AST_SUM, 0, $1, $3, 0, 0); }
+    | expr '-' expr     { $$ = ast_create(AST_SUB, 0, $1, $3, 0, 0); }
+    | expr '*' expr     { $$ = ast_create(AST_MUL, 0, $1, $3, 0, 0); }
+    | expr '/' expr     { $$ = ast_create(AST_DIV, 0, $1, $3, 0, 0); }
+    | expr '<' expr     { $$ = ast_create(AST_LESS, 0, $1, $3, 0, 0); }
+    | expr '>' expr     { $$ = ast_create(AST_GREATER, 0, $1, $3, 0, 0); }
+    | expr OPERATOR_LE expr     { $$ = ast_create(AST_LE, 0, $1, $3, 0, 0); }
+    | expr OPERATOR_GE expr     { $$ = ast_create(AST_GE, 0, $1, $3, 0, 0); }
+    | expr OPERATOR_EQ expr     { $$ = ast_create(AST_EQ, 0, $1, $3, 0, 0); }
+    | expr OPERATOR_DIF expr        { $$ = ast_create(AST_DIF, 0, $1, $3, 0, 0); }
+    | expr '&' expr     { $$ = ast_create(AST_AND, 0, $1, $3, 0, 0); }
+    | expr '|' expr     { $$ = ast_create(AST_OR, 0, $1, $3, 0, 0); }
+    | '~' expr     { $$ = ast_create(AST_NOT, 0, $2, 0, 0, 0); }
     ;
 
 literal_list: literal
@@ -150,21 +153,21 @@ param_list:
           | param param_l
           ;
 
-args_list: arg args_l
+args_list: arg args_l       { $$ = ast_create(AST_ARGS_LIST, 0, $1, $2, 0, 0); }
          ;
 
 param_l:
        | ','param param_l
        ;
 
-args_l:
-      | ','arg args_l
+args_l:                     { $$ = 0; }
+      | ','arg args_l       { $$ = ast_create(AST_ARGS_LIST, 0, $2, $3, 0, 0); }
       ;
 
 param: type identifier
      ;
 
-arg: expr
+arg: expr       { $$ = $1; }
    ;
 
 empty_command: ';'
@@ -176,15 +179,15 @@ type: KW_CHAR
     | KW_BOOL
     ;
 
-identifier: TK_IDENTIFIER       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
+identifier: TK_IDENTIFIER       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
           ;
 
-literal: LIT_INT        { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
-       | LIT_CHAR       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
-       | LIT_REAL       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
-       | LIT_FALSE      { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
-       | LIT_TRUE       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
-       | LIT_STRING     { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); ast_print($$, 0); }
+literal: LIT_INT        { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
+       | LIT_CHAR       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
+       | LIT_REAL       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
+       | LIT_FALSE      { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
+       | LIT_TRUE       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
+       | LIT_STRING     { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
        ;
 
 %%

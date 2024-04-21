@@ -8,7 +8,23 @@
 #define MAX_CHILDREN 4
 
 enum AstNodeType {
-    AST_SYMBOL 
+    AST_SYMBOL,
+    AST_SUM,
+    AST_SUB,
+    AST_MUL,
+    AST_DIV,
+    AST_LESS,
+    AST_GREATER,
+    AST_LE,
+    AST_GE,
+    AST_EQ,
+    AST_DIF,
+    AST_AND,
+    AST_OR,
+    AST_NOT,
+    AST_VEC_EXP,
+    AST_FUNC_EXP,
+    AST_ARGS_LIST
 };
 
 typedef struct AstNode {
