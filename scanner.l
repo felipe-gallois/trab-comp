@@ -28,9 +28,9 @@ ESCAPE_SEQ "\\n"|"\\\""
 "print"     { return KW_PRINT; }
 "return"     { return KW_RETURN; }
 
-"false"     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_BOOL);
+"false"     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_FALSE);
               return LIT_FALSE; }
-"true"      { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_BOOL);
+"true"      { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_TRUE);
               return LIT_TRUE; }
 
 "//"        { BEGIN(SINGLE_COMMENT); }

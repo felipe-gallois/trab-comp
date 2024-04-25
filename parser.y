@@ -51,6 +51,17 @@ AstNode *ast_node;
 %type<ast_node> arg
 %type<ast_node> args_l
 %type<ast_node> args_list
+%type<ast_node> empty_command
+%type<ast_node> variable_attribution
+%type<ast_node> vector_attribution
+%type<ast_node> read_command
+%type<ast_node> print_command
+%type<ast_node> return_command
+%type<ast_node> if_expr
+%type<ast_node> while_expr
+%type<ast_node> command
+%type<ast_node> commands
+%type<ast_node> command_block
 
 %left '|'
 %left '&'
@@ -84,45 +95,45 @@ vector_declaration: type identifier'['literal']'';'
 function_declaration: type identifier '('param_list')' command_block
                     ;
 
-command_block: '{'commands'}'
+command_block: '{'commands'}'       { $$ = $2; }
              ;
 
-commands:
-        | command commands
+commands:                       { $$ = 0; }
+        | command commands      { $$ = ast_create(AST_CMD_LIST, 0, $1, $2, 0, 0); }
         ;
 
-command: empty_command
-       | variable_attribution
-       | vector_attribution
-       | read_command
-       | print_command
-       | return_command
-       | if_expr
-       | while_expr
-       | command_block
+command: empty_command      { $$ = $1; ast_print($$, 0); }
+       | variable_attribution       { $$ = $1; ast_print($$, 0); }
+       | vector_attribution     { $$ = $1; ast_print($$, 0); }
+       | read_command       { $$ = $1; ast_print($$, 0); }
+       | print_command      { $$ = $1; ast_print($$, 0); }
+       | return_command     { $$ = $1; ast_print($$, 0); }
+       | if_expr        { $$ = $1; ast_print($$, 0); }
+       | while_expr     { $$ = $1; ast_print($$, 0); }
+       | command_block      { $$ = $1; ast_print($$, 0); }
        ;
 
-variable_attribution: identifier '=' expr';'        { ast_print($3, 0); }
+variable_attribution: identifier '=' expr';'        { $$ = ast_create(AST_VAR_ATTRIB, 0, $1, $3, 0, 0); }
                     ;
 
-vector_attribution: identifier'['expr']' '=' expr';'        { ast_print($3, 0); ast_print($6, 0); }
+vector_attribution: identifier'['expr']' '=' expr';'        { $$ = ast_create(AST_VEC_ATTRIB, 0, $1, $3, $6, 0); }
                   ;
 
-read_command: KW_READ type expr';'      { ast_print($3, 0); }
+read_command: KW_READ type expr';'      { $$ = ast_create(-1, 0, 0, 0, 0, 0); }
             ;
 
-print_command: KW_PRINT expr';'     { ast_print($2, 0); }
-             | KW_PRINT type expr';'        { ast_print($3, 0); }
+print_command: KW_PRINT expr';'     { $$ = ast_create(-1, 0, 0, 0, 0, 0); }
+             | KW_PRINT type expr';'        { $$ = ast_create(-1, 0, 0, 0, 0, 0); }
              ;
 
-return_command: KW_RETURN expr';'       { ast_print($2, 0); }
+return_command: KW_RETURN expr';'       { $$ = ast_create(AST_RET, 0, $2, 0, 0, 0); }
               ;
 
-if_expr: KW_IF '('expr')' command       { ast_print($3, 0); }
-       | KW_IF '('expr')' command KW_ELSE command       { ast_print($3, 0); }
+if_expr: KW_IF '('expr')' command       { $$ = ast_create(AST_IF, 0, $3, $5, 0, 0); }
+       | KW_IF '('expr')' command KW_ELSE command       { $$ = ast_create(AST_IF, 0, $3, $5, $7, 0); }
        ;
 
-while_expr: KW_WHILE '('expr')' command     { ast_print($3, 0); }
+while_expr: KW_WHILE '('expr')' command     { $$ = ast_create(AST_WHILE, 0, $3, $5, 0, 0); }
           ;
 
 expr: literal       { $$ = $1; }
@@ -170,7 +181,7 @@ param: type identifier
 arg: expr       { $$ = $1; }
    ;
 
-empty_command: ';'
+empty_command: ';'      { $$ = ast_create(-1, 0, 0, 0, 0, 0); }
              ;
 
 type: KW_CHAR

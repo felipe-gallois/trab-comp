@@ -17,7 +17,7 @@ AstNode *ast_create(int type, HashEntry *symbol, AstNode* c0, AstNode* c1,
     return new_node;
 }
 
-void ast_print(AstNode *node, int level) {
+void ast_print_node(AstNode *node, int level) {
     if (node == NULL)
         return;
 
@@ -79,6 +79,24 @@ void ast_print(AstNode *node, int level) {
         case AST_ARGS_LIST:
             fprintf(stderr, "AST_ARGS_LIST");
             break;
+        case AST_CMD_LIST:
+            fprintf(stderr, "AST_CMD_LIST");
+            break;
+        case AST_VAR_ATTRIB:
+            fprintf(stderr, "AST_VAR_ATTRIB");
+            break;
+        case AST_VEC_ATTRIB:
+            fprintf(stderr, "AST_VEC_ATTRIB");
+            break;
+        case AST_RET:
+            fprintf(stderr, "AST_RET");
+            break;
+        case AST_IF:
+            fprintf(stderr, "AST_IF");
+            break;
+        case AST_WHILE:
+            fprintf(stderr, "AST_WHILE");
+            break;
         default:
             fprintf(stderr, "AST_UNKNOWN");
     }
@@ -89,6 +107,13 @@ void ast_print(AstNode *node, int level) {
     }
 
     fprintf(stderr, "\n");
+}
+
+void ast_print(AstNode *node, int level) {
+    if (node == NULL)
+        return;
+
+    ast_print_node(node, level);
 
     for (int i = 0; i < MAX_CHILDREN; i++)
         ast_print(node->children[i], level + 1);

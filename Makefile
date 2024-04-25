@@ -5,7 +5,7 @@
 #
 
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -g
 
 SRC1 = y.tab.c lex.yy.c
 SRC2 = hash.c ast.c main.c

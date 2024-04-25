@@ -24,7 +24,13 @@ enum AstNodeType {
     AST_NOT,
     AST_VEC_EXP,
     AST_FUNC_EXP,
-    AST_ARGS_LIST
+    AST_ARGS_LIST,
+    AST_CMD_LIST,
+    AST_VAR_ATTRIB,
+    AST_VEC_ATTRIB,
+    AST_RET,
+    AST_IF,
+    AST_WHILE
 };
 
 typedef struct AstNode {
@@ -35,6 +41,8 @@ typedef struct AstNode {
 
 AstNode *ast_create(int type, HashEntry *symbol, AstNode* c0, AstNode* c1,
         AstNode* c2, AstNode* c3);
+
+void ast_print_node(AstNode *node, int level);
 
 void ast_print(AstNode *node, int level);
 
