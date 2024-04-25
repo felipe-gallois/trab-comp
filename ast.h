@@ -38,7 +38,10 @@ enum AstNodeType {
     AST_READ,
     AST_IF,
     AST_WHILE,
-    AST_BLOCK
+    AST_BLOCK,
+    AST_PARAM,
+    AST_PARAM_LIST,
+    AST_FUNC_DECL
 };
 
 typedef struct AstNode {

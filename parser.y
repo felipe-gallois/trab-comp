@@ -50,8 +50,11 @@ AstNode *ast_node;
 %type<ast_node> type
 %type<ast_node> expr
 %type<ast_node> arg
+%type<ast_node> param
 %type<ast_node> args_l
+%type<ast_node> param_l
 %type<ast_node> args_list
+%type<ast_node> param_list
 %type<ast_node> empty_command
 %type<ast_node> variable_attribution
 %type<ast_node> vector_attribution
@@ -63,6 +66,7 @@ AstNode *ast_node;
 %type<ast_node> command
 %type<ast_node> commands
 %type<ast_node> command_block
+%type<ast_node> function_declaration
 
 %left '|'
 %left '&'
@@ -93,7 +97,8 @@ vector_declaration: type identifier'['literal']'';'
                   | type identifier'['literal']'':' literal_list';'
                   ;
 
-function_declaration: type identifier '('param_list')' command_block { ast_print($6, 0); }
+function_declaration: type identifier '('param_list')' command_block { $$ = ast_create(AST_FUNC_DECL, 0, $1, $2, $4, $6);
+                                                                       ast_print($$, 0); }
                     ;
 
 command_block: '{'commands'}'       { $$ = ast_create(AST_BLOCK, 0, $2, 0, 0, 0); }
@@ -161,22 +166,23 @@ literal_list: literal
             | literal literal_list
             ;
 
-param_list: 
-          | param param_l
+param_list:                     { $$ = 0; } 
+          | param param_l       { $$ = ast_create(AST_PARAM_LIST, 0, $1, $2, 0, 0); }
           ;
 
-args_list: arg args_l       { $$ = ast_create(AST_ARGS_LIST, 0, $1, $2, 0, 0); }
+args_list:                  { $$ = 0; }
+         | arg args_l       { $$ = ast_create(AST_ARGS_LIST, 0, $1, $2, 0, 0); }
          ;
 
-param_l:
-       | ','param param_l
+param_l:                        { $$ = 0; }
+       | ','param param_l       { $$ = ast_create(AST_PARAM_LIST, 0, $2, $3, 0, 0); }
        ;
 
 args_l:                     { $$ = 0; }
       | ','arg args_l       { $$ = ast_create(AST_ARGS_LIST, 0, $2, $3, 0, 0); }
       ;
 
-param: type identifier
+param: type identifier      { $$ = ast_create(AST_PARAM, 0, $1, $2, 0, 0); }
      ;
 
 arg: expr       { $$ = $1; }

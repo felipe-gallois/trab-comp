@@ -121,6 +121,15 @@ void ast_print_node(AstNode *node, int level) {
         case AST_BLOCK:
             fprintf(stderr, "AST_BLOCK");
             break;
+        case AST_PARAM:
+            fprintf(stderr, "AST_PARAM");
+            break;
+        case AST_PARAM_LIST:
+            fprintf(stderr, "AST_PARAM_LIST");
+            break;
+        case AST_FUNC_DECL:
+            fprintf(stderr, "AST_FUNC_DECL");
+            break;
         default:
             fprintf(stderr, "AST_UNKNOWN");
     }
