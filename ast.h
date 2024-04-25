@@ -9,6 +9,10 @@
 
 enum AstNodeType {
     AST_SYMBOL,
+    AST_BOOL,
+    AST_FLOAT,
+    AST_INT,
+    AST_CHAR,
     AST_SUM,
     AST_SUB,
     AST_MUL,
@@ -29,6 +33,9 @@ enum AstNodeType {
     AST_VAR_ATTRIB,
     AST_VEC_ATTRIB,
     AST_RET,
+    AST_EMPTY,
+    AST_PRINT,
+    AST_READ,
     AST_IF,
     AST_WHILE,
     AST_BLOCK

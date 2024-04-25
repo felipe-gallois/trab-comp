@@ -31,6 +31,18 @@ void ast_print_node(AstNode *node, int level) {
         case AST_SYMBOL:
             fprintf(stderr, "AST_SYMBOL");
             break;
+        case AST_BOOL:
+            fprintf(stderr, "AST_BOOL");
+            break;
+        case AST_FLOAT:
+            fprintf(stderr, "AST_FLOAT");
+            break;
+        case AST_INT:
+            fprintf(stderr, "AST_INT");
+            break;
+        case AST_CHAR:
+            fprintf(stderr, "AST_CHAR");
+            break;
         case AST_SUM:
             fprintf(stderr, "AST_SUM");
             break;
@@ -90,6 +102,15 @@ void ast_print_node(AstNode *node, int level) {
             break;
         case AST_RET:
             fprintf(stderr, "AST_RET");
+            break;
+        case AST_EMPTY:
+            fprintf(stderr, "AST_EMPTY");
+            break;
+        case AST_PRINT:
+            fprintf(stderr, "AST_PRINT");
+            break;
+        case AST_READ:
+            fprintf(stderr, "AST_READ");
             break;
         case AST_IF:
             fprintf(stderr, "AST_IF");
