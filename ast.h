@@ -30,7 +30,8 @@ enum AstNodeType {
     AST_VEC_ATTRIB,
     AST_RET,
     AST_IF,
-    AST_WHILE
+    AST_WHILE,
+    AST_BLOCK
 };
 
 typedef struct AstNode {

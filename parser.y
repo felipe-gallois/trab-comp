@@ -95,7 +95,7 @@ vector_declaration: type identifier'['literal']'';'
 function_declaration: type identifier '('param_list')' command_block
                     ;
 
-command_block: '{'commands'}'       { $$ = $2; }
+command_block: '{'commands'}'       { $$ = ast_create(AST_BLOCK, 0, $2, 0, 0, 0); }
              ;
 
 commands:                       { $$ = 0; }

@@ -97,6 +97,9 @@ void ast_print_node(AstNode *node, int level) {
         case AST_WHILE:
             fprintf(stderr, "AST_WHILE");
             break;
+        case AST_BLOCK:
+            fprintf(stderr, "AST_BLOCK");
+            break;
         default:
             fprintf(stderr, "AST_UNKNOWN");
     }
