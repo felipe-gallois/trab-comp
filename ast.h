@@ -29,6 +29,7 @@ enum AstNodeType {
     AST_VEC_EXP,
     AST_FUNC_EXP,
     AST_ARGS_LIST,
+    AST_LIT_LIST,
     AST_CMD_LIST,
     AST_VAR_ATTRIB,
     AST_VEC_ATTRIB,
@@ -41,7 +42,11 @@ enum AstNodeType {
     AST_BLOCK,
     AST_PARAM,
     AST_PARAM_LIST,
-    AST_FUNC_DECL
+    AST_FUNC_DECL,
+    AST_VEC_DECL,
+    AST_VAR_DECL,
+    AST_DECL_LIST,
+    AST_PROGRAM
 };
 
 typedef struct AstNode {

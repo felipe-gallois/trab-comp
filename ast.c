@@ -91,6 +91,9 @@ void ast_print_node(AstNode *node, int level) {
         case AST_ARGS_LIST:
             fprintf(stderr, "AST_ARGS_LIST");
             break;
+        case AST_LIT_LIST:
+            fprintf(stderr, "AST_LIT_LIST");
+            break;
         case AST_CMD_LIST:
             fprintf(stderr, "AST_CMD_LIST");
             break;
@@ -129,6 +132,18 @@ void ast_print_node(AstNode *node, int level) {
             break;
         case AST_FUNC_DECL:
             fprintf(stderr, "AST_FUNC_DECL");
+            break;
+        case AST_VEC_DECL:
+            fprintf(stderr, "AST_VEC_DECL");
+            break;
+        case AST_VAR_DECL:
+            fprintf(stderr, "AST_VAR_DECL");
+            break;
+        case AST_DECL_LIST:
+            fprintf(stderr, "AST_DECL_LIST");
+            break;
+        case AST_PROGRAM:
+            fprintf(stderr, "AST_PROGRAM");
             break;
         default:
             fprintf(stderr, "AST_UNKNOWN");

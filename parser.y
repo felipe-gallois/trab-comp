@@ -55,6 +55,7 @@ AstNode *ast_node;
 %type<ast_node> param_l
 %type<ast_node> args_list
 %type<ast_node> param_list
+%type<ast_node> literal_list
 %type<ast_node> empty_command
 %type<ast_node> variable_attribution
 %type<ast_node> vector_attribution
@@ -67,6 +68,11 @@ AstNode *ast_node;
 %type<ast_node> commands
 %type<ast_node> command_block
 %type<ast_node> function_declaration
+%type<ast_node> vector_declaration
+%type<ast_node> variable_declaration
+%type<ast_node> declaration
+%type<ast_node> declarations
+%type<ast_node> program
 
 %left '|'
 %left '&'
@@ -78,27 +84,26 @@ AstNode *ast_node;
 
 %%
 
-program: declarations
+program: declarations       { $$ = ast_create(AST_PROGRAM, 0, $1, 0, 0, 0); ast_print($$, 0); }
        ;
 
-declarations:
-            | declaration declarations
+declarations:                               { $$ = ast_create(AST_DECL_LIST, 0, 0, 0, 0, 0); }
+            | declaration declarations      { $$ = ast_create(AST_DECL_LIST, 0, $1, $2, 0, 0); }
             ;
 
-declaration: variable_declaration
-           | vector_declaration
-           | function_declaration
+declaration: variable_declaration       { $$ = $1; }
+           | vector_declaration     { $$ = $1; }
+           | function_declaration       { $$ = $1; }
            ;
 
-variable_declaration: type identifier':'literal';'
+variable_declaration: type identifier':'literal';'      { $$ = ast_create(AST_VAR_DECL, 0, $1, $2, $4, 0); }
                     ;
 
-vector_declaration: type identifier'['literal']'';'
-                  | type identifier'['literal']'':' literal_list';'
+vector_declaration: type identifier'['literal']'';'     { $$ = ast_create(AST_VEC_DECL, 0, $1, $2, $4, 0); }
+                  | type identifier'['literal']'':' literal_list';'     { $$ = ast_create(AST_VEC_DECL, 0, $1, $2, $4, $7); }
                   ;
 
-function_declaration: type identifier '('param_list')' command_block { $$ = ast_create(AST_FUNC_DECL, 0, $1, $2, $4, $6);
-                                                                       ast_print($$, 0); }
+function_declaration: type identifier '('param_list')' command_block { $$ = ast_create(AST_FUNC_DECL, 0, $1, $2, $4, $6); }
                     ;
 
 command_block: '{'commands'}'       { $$ = ast_create(AST_BLOCK, 0, $2, 0, 0, 0); }
@@ -162,8 +167,8 @@ expr: literal       { $$ = $1; }
     | '~' expr     { $$ = ast_create(AST_NOT, 0, $2, 0, 0, 0); }
     ;
 
-literal_list: literal
-            | literal literal_list
+literal_list: literal       { $$ = ast_create(AST_LIT_LIST, 0, $1, 0, 0, 0); }
+            | literal literal_list      { $$ = ast_create(AST_LIT_LIST, 0, $1, $2, 0, 0); }
             ;
 
 param_list:                     { $$ = 0; } 
