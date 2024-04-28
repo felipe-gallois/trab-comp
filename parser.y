@@ -7,6 +7,8 @@
 #include "hash.h"
 #include "ast.h"
 
+extern AstNode *ast_root;
+
 int yylex();
 int yyerror();
 int getLineNumber();
@@ -85,7 +87,7 @@ AstNode *ast_node;
 
 %%
 
-program: declarations       { $$ = $1; ast_print($$, 0); }
+program: declarations       { $$ = $1; ast_root = $$; }
        ;
 
 declarations:                               { $$ = 0; }
