@@ -133,7 +133,8 @@ vector_attribution: identifier'['expr']' '=' expr';'        { $$ = ast_create(AS
 read_command: KW_READ type expr';'      { $$ = ast_create(AST_READ, 0, $2, $3, 0, 0); }
             ;
 
-print_command: KW_PRINT expr';'     { $$ = ast_create(AST_PRINT, 0, 0, $2, 0, 0); }
+print_command: KW_PRINT LIT_STRING';'     { AstNode *string = ast_create(AST_SYMBOL, $2, 0, 0, 0, 0);
+                                            $$ = ast_create(AST_PRINT, 0, 0, string, 0, 0); }
              | KW_PRINT type expr';'        { $$ = ast_create(AST_PRINT, 0, $2, $3, 0, 0); }
              ;
 
@@ -210,7 +211,6 @@ literal: LIT_INT        { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
        | LIT_REAL       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
        | LIT_FALSE      { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
        | LIT_TRUE       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
-       | LIT_STRING     { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
        ;
 
 %%
