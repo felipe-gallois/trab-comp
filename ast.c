@@ -154,9 +154,6 @@ void ast_print_node(AstNode *node, int level) {
         case AST_DECL_LIST:
             fprintf(stderr, "AST_DECL_LIST");
             break;
-        case AST_PROGRAM:
-            fprintf(stderr, "AST_PROGRAM");
-            break;
         default:
             fprintf(stderr, "AST_UNKNOWN");
     }

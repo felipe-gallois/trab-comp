@@ -49,8 +49,7 @@ enum AstNodeType {
     AST_VEC_DECL,
     AST_VEC_DECL_DEF,
     AST_VAR_DECL,
-    AST_DECL_LIST,
-    AST_PROGRAM
+    AST_DECL_LIST
 };
 
 typedef struct AstNode {

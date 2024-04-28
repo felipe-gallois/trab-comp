@@ -88,7 +88,7 @@ AstNode *ast_node;
 program: declarations       { $$ = $1; ast_print($$, 0); }
        ;
 
-declarations:                               { $$ = ast_create(AST_DECL_LIST, 0, 0, 0, 0, 0); }
+declarations:                               { $$ = 0; }
             | declaration declarations      { $$ = ast_create(AST_DECL_LIST, 0, $1, $2, 0, 0); }
             ;
 
