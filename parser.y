@@ -46,6 +46,7 @@ AstNode *ast_node;
 %token TOKEN_ERROR
 
 %type<ast_node> identifier
+%type<ast_node> string_lit
 %type<ast_node> literal
 %type<ast_node> type
 %type<ast_node> expr
@@ -84,7 +85,7 @@ AstNode *ast_node;
 
 %%
 
-program: declarations       { $$ = ast_create(AST_PROGRAM, 0, $1, 0, 0, 0); ast_print($$, 0); }
+program: declarations       { $$ = $1; ast_print($$, 0); }
        ;
 
 declarations:                               { $$ = ast_create(AST_DECL_LIST, 0, 0, 0, 0, 0); }
@@ -100,7 +101,7 @@ variable_declaration: type identifier':'literal';'      { $$ = ast_create(AST_VA
                     ;
 
 vector_declaration: type identifier'['literal']'';'     { $$ = ast_create(AST_VEC_DECL, 0, $1, $2, $4, 0); }
-                  | type identifier'['literal']'':' literal_list';'     { $$ = ast_create(AST_VEC_DECL, 0, $1, $2, $4, $7); }
+                  | type identifier'['literal']'':' literal_list';'     { $$ = ast_create(AST_VEC_DECL_DEF, 0, $1, $2, $4, $7); }
                   ;
 
 function_declaration: type identifier '('param_list')' command_block { $$ = ast_create(AST_FUNC_DECL, 0, $1, $2, $4, $6); }
@@ -133,16 +134,15 @@ vector_attribution: identifier'['expr']' '=' expr';'        { $$ = ast_create(AS
 read_command: KW_READ type expr';'      { $$ = ast_create(AST_READ, 0, $2, $3, 0, 0); }
             ;
 
-print_command: KW_PRINT LIT_STRING';'     { AstNode *string = ast_create(AST_SYMBOL, $2, 0, 0, 0, 0);
-                                            $$ = ast_create(AST_PRINT, 0, 0, string, 0, 0); }
-             | KW_PRINT type expr';'        { $$ = ast_create(AST_PRINT, 0, $2, $3, 0, 0); }
+print_command: KW_PRINT string_lit';'     { $$ = ast_create(AST_PRINT_STRING, 0, $2, 0, 0, 0); }
+             | KW_PRINT type expr';'        { $$ = ast_create(AST_PRINT_LIT, 0, $2, $3, 0, 0); }
              ;
 
 return_command: KW_RETURN expr';'       { $$ = ast_create(AST_RET, 0, $2, 0, 0, 0); }
               ;
 
 if_expr: KW_IF '('expr')' command       { $$ = ast_create(AST_IF, 0, $3, $5, 0, 0); }
-       | KW_IF '('expr')' command KW_ELSE command       { $$ = ast_create(AST_IF, 0, $3, $5, $7, 0); }
+       | KW_IF '('expr')' command KW_ELSE command       { $$ = ast_create(AST_IF_ELSE, 0, $3, $5, $7, 0); }
        ;
 
 while_expr: KW_WHILE '('expr')' command     { $$ = ast_create(AST_WHILE, 0, $3, $5, 0, 0); }
@@ -152,7 +152,7 @@ expr: literal       { $$ = $1; }
     | identifier     { $$ = $1; }
     | identifier'['expr']'       { $$ = ast_create(AST_VEC_EXP, 0, $1, $3, 0, 0); }
     | identifier'('args_list')'      { $$ = ast_create(AST_FUNC_EXP, 0, $1, $3, 0, 0); }
-    | '('expr')'        { $$ = $2; }
+    | '('expr')'        { $$ = ast_create(AST_PAR, 0, $2, 0, 0, 0); }
     | expr '+' expr     { $$ = ast_create(AST_SUM, 0, $1, $3, 0, 0); }
     | expr '-' expr     { $$ = ast_create(AST_SUB, 0, $1, $3, 0, 0); }
     | expr '*' expr     { $$ = ast_create(AST_MUL, 0, $1, $3, 0, 0); }
@@ -212,6 +212,9 @@ literal: LIT_INT        { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
        | LIT_FALSE      { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
        | LIT_TRUE       { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
        ;
+
+string_lit: LIT_STRING      { $$ = ast_create(AST_SYMBOL, $1, 0, 0, 0, 0); }
+          ;
 
 %%
 

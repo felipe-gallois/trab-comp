@@ -109,8 +109,11 @@ void ast_print_node(AstNode *node, int level) {
         case AST_EMPTY:
             fprintf(stderr, "AST_EMPTY");
             break;
-        case AST_PRINT:
-            fprintf(stderr, "AST_PRINT");
+        case AST_PRINT_STRING:
+            fprintf(stderr, "AST_PRINT_STRING");
+            break;
+        case AST_PRINT_LIT:
+            fprintf(stderr, "AST_PRINT_LIT");
             break;
         case AST_READ:
             fprintf(stderr, "AST_READ");
@@ -118,11 +121,17 @@ void ast_print_node(AstNode *node, int level) {
         case AST_IF:
             fprintf(stderr, "AST_IF");
             break;
+        case AST_IF_ELSE:
+            fprintf(stderr, "AST_IF_ELSE");
+            break;
         case AST_WHILE:
             fprintf(stderr, "AST_WHILE");
             break;
         case AST_BLOCK:
             fprintf(stderr, "AST_BLOCK");
+            break;
+        case AST_PAR:
+            fprintf(stderr, "AST_PAR");
             break;
         case AST_PARAM:
             fprintf(stderr, "AST_PARAM");
@@ -135,6 +144,9 @@ void ast_print_node(AstNode *node, int level) {
             break;
         case AST_VEC_DECL:
             fprintf(stderr, "AST_VEC_DECL");
+            break;
+        case AST_VEC_DECL_DEF:
+            fprintf(stderr, "AST_VEC_DECL_DEF");
             break;
         case AST_VAR_DECL:
             fprintf(stderr, "AST_VAR_DECL");
@@ -154,7 +166,7 @@ void ast_print_node(AstNode *node, int level) {
         fprintf(stderr, "%s", node->symbol->string);
     }
 
-    fprintf(stderr, "\n");
+    fprintf(stderr, ")\n");
 }
 
 void ast_print(AstNode *node, int level) {
