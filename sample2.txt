@@ -1,0 +1,12 @@
+bool a:false;
+float x:0;
+float y:0;
+
+int main() {
+    if (~a) {
+        x = (2. + 3.) / 5.;
+        y = 2. + 3. / 5.;
+    }
+
+    return x - y;
+}
