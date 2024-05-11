@@ -51,7 +51,7 @@ HashEntry *insert_entry(char *string, int type) {
 void print_hash() {
     for (int i = 0; i < HASH_SIZE; i++) {
         for (HashEntry *entry = table[i]; entry; entry = entry->next)
-            printf("Table[%d] has %s\n", i, entry->string);
+            printf("Table[%d] has %s with type %d\n", i, entry->string, entry->type);
     }
 }
 

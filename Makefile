@@ -8,14 +8,14 @@ CC = gcc
 CFLAGS = -Wall -g
 
 SRC1 = y.tab.c lex.yy.c
-SRC2 = hash.c ast.c decompilation.c main.c
+SRC2 = hash.c ast.c semantic.c decompilation.c main.c
 SRC = $(SRC1) $(SRC2)
 
 OBJS = $(SRC:.c=.o)
 
 AUX1 = $(SRC1:.c=.h)
 
-BIN = etapa3
+BIN = etapa4
 
 $(BIN): $(OBJS)
 	$(CC) -o $(BIN) $(OBJS)

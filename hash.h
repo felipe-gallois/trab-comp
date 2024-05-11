@@ -12,11 +12,22 @@ enum SymbolType {
     SYMBOL_LIT_REAL,
     SYMBOL_LIT_FALSE,
     SYMBOL_LIT_TRUE,
-    SYMBOL_LIT_STRING
+    SYMBOL_LIT_STRING,
+    SYMBOL_VARIABLE,
+    SYMBOL_VECTOR,
+    SYMBOL_FUNCTION
+};
+
+enum DataType {
+    DATATYPE_INT,
+    DATATYPE_CHAR,
+    DATATYPE_REAL,
+    DATATYPE_BOOL
 };
 
 typedef struct HashEntry {
     int type;
+    int datatype;
     char *string;
     struct HashEntry *next;
 } HashEntry;
