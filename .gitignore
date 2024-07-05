@@ -9,3 +9,6 @@ y.tab.*
 
 # Executables
 etapa*
+
+# Output file
+output.txt
