@@ -40,6 +40,10 @@ void check_and_set_declarations(AstNode *node) {
         check_and_set_declarations(node->children[i]);
 }
 
+void check_undeclared() {
+    semantic_errors += verify_undeclared();
+}
+
 int is_declaration(AstNode *node) {
     int node_type = node->type;
 

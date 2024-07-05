@@ -6,5 +6,6 @@
 #include "ast.h"
 
 void check_and_set_declarations(AstNode *node);
+void check_undeclared();
 
 #endif

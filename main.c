@@ -31,6 +31,7 @@ int main(int argc, char** argv) {
     yyparse();
     ast_print(ast_root, 0);
     check_and_set_declarations(ast_root);
+    check_undeclared();
     decompile(ast_root, argv[2]);
     print_hash();
 

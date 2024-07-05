@@ -38,6 +38,7 @@ void hash_init();
 int get_address(char *string);
 HashEntry *find_entry(char *string);
 HashEntry *insert_entry(char *string, enum SymbolType type);
+int verify_undeclared();
 void print_hash();
 
 #endif
