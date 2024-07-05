@@ -15,19 +15,21 @@ enum SymbolType {
     SYMBOL_LIT_STRING,
     SYMBOL_VARIABLE,
     SYMBOL_VECTOR,
-    SYMBOL_FUNCTION
+    SYMBOL_FUNCTION,
 };
 
 enum DataType {
+    DATATYPE_UNKNOWN,
     DATATYPE_INT,
     DATATYPE_CHAR,
     DATATYPE_REAL,
-    DATATYPE_BOOL
+    DATATYPE_BOOL,
+    DATATYPE_STRING,
 };
 
 typedef struct HashEntry {
-    int type;
-    int datatype;
+    enum SymbolType type;
+    enum DataType datatype;
     char *string;
     struct HashEntry *next;
 } HashEntry;
@@ -35,7 +37,7 @@ typedef struct HashEntry {
 void hash_init();
 int get_address(char *string);
 HashEntry *find_entry(char *string);
-HashEntry *insert_entry(char *string, int type);
+HashEntry *insert_entry(char *string, enum SymbolType type);
 void print_hash();
 
 #endif

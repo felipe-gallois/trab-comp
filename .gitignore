@@ -1,0 +1,11 @@
+# Lex files
+lex.yy.*
+
+# Yacc files
+y.tab.*
+
+# Compilation objects
+*.o
+
+# Executables
+etapa*

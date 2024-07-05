@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
     initMe();
     yyparse();
     ast_print(ast_root, 0);
-    annotate_types(ast_root);
+    check_and_set_declarations(ast_root);
     decompile(ast_root, argv[2]);
     print_hash();
 

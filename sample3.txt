@@ -1,0 +1,6 @@
+// Identificador redeclarado
+
+char a:10;
+char a:15;
+
+int main() {}

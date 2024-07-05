@@ -5,6 +5,6 @@
 
 #include "ast.h"
 
-void annotate_types(AstNode *node);
+void check_and_set_declarations(AstNode *node);
 
 #endif

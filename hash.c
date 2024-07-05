@@ -31,7 +31,7 @@ HashEntry *find_entry(char *string) {
     return NULL;    // no matches
 }
 
-HashEntry *insert_entry(char *string, int type) {
+HashEntry *insert_entry(char *string, enum SymbolType type) {
     int address = get_address(string);
 
     HashEntry *new_entry;
@@ -40,6 +40,7 @@ HashEntry *insert_entry(char *string, int type) {
 
     new_entry = (HashEntry*) malloc(sizeof(HashEntry));
     new_entry->type = type;
+    new_entry->datatype = DATATYPE_UNKNOWN;
     new_entry->string = (char*) malloc((strlen(string) + 1)
                                        * sizeof(HashEntry));
     strcpy(new_entry->string, string);
@@ -51,7 +52,11 @@ HashEntry *insert_entry(char *string, int type) {
 void print_hash() {
     for (int i = 0; i < HASH_SIZE; i++) {
         for (HashEntry *entry = table[i]; entry; entry = entry->next)
-            printf("Table[%d] has %s with type %d\n", i, entry->string, entry->type);
+            printf("Table[%d] has %s with type %d and datatype %d\n",
+                    i,
+                    entry->string,
+                    entry->type,
+                    entry->datatype);
     }
 }
 
