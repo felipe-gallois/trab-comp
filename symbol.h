@@ -1,11 +1,9 @@
 // UFRGS - Compiladores - Felipe Gallois - 2024/1
 
-#ifndef HASH_H
-#define HASH_H
+#ifndef SYMBOL_H
+#define SYMBOL_H
 
-#define HASH_SIZE 997
-
-enum SymbolType {
+typedef enum SymbolType {
     SYMBOL_TK_IDENTIFIER,
     SYMBOL_LIT_INT,
     SYMBOL_LIT_CHAR,
@@ -16,29 +14,21 @@ enum SymbolType {
     SYMBOL_VARIABLE,
     SYMBOL_VECTOR,
     SYMBOL_FUNCTION,
-};
+} symbol_type_t;
 
-enum DataType {
+typedef enum DataType {
     DATATYPE_UNKNOWN,
     DATATYPE_INT,
     DATATYPE_CHAR,
     DATATYPE_REAL,
     DATATYPE_BOOL,
     DATATYPE_STRING,
-};
+} data_type_t;
 
-typedef struct HashEntry {
-    enum SymbolType type;
-    enum DataType datatype;
+typedef struct Symbol {
+    symbol_type_t type;
+    data_type_t datatype;
     char *string;
-    struct HashEntry *next;
-} HashEntry;
-
-void hash_init();
-int get_address(char *string);
-HashEntry *find_entry(char *string);
-HashEntry *insert_entry(char *string, enum SymbolType type);
-int verify_undeclared();
-void print_hash();
+} symbol_t;
 
 #endif
