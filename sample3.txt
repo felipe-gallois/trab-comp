@@ -1,6 +1,11 @@
-// Identificador redeclarado
-
 char a:10;
-char a:15;
+char a:15; // Identificador redeclarado
 
-int main() {}
+int b:30;
+float c:50;
+
+int main() {
+    b = b + c; // Operandos errados op aritmética
+    a = a + b;
+}
+

@@ -6,6 +6,6 @@
 #include "ast.h"
 
 void check_and_set_declarations(AstNode *node);
-void check_undeclared();
+enum DataType check_nodes(AstNode *node);
 
 #endif

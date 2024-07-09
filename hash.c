@@ -49,23 +49,6 @@ HashEntry *insert_entry(char *string, enum SymbolType type) {
     return new_entry;
 }
 
-int verify_undeclared() {
-    int count = 0;
-
-    for (int i = 0; i < HASH_SIZE; i++) {
-        for (HashEntry *entry = table[i]; entry; entry = entry->next) {
-            if (entry->type == SYMBOL_TK_IDENTIFIER) {
-                fprintf(stderr,
-                        "Semantic error: identifier %s undeclared\n",
-                        entry->string); 
-                count++;
-            }
-        }
-    }
-
-    return count;
-}
-
 void print_hash() {
     for (int i = 0; i < HASH_SIZE; i++) {
         for (HashEntry *entry = table[i]; entry; entry = entry->next)
