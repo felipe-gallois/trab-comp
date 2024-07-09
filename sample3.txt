@@ -7,9 +7,12 @@ float c:50;
 bool d:false;
 
 int main() {
-    b = b + c; // Operandos errados op aritmética
     a = a + b;
 
-    d = c > b; // Tipos incompatíveis 
+    // Tipos incompatíveis 
+    d = c > b;
+    b = b + c;
+    d = d == b;
+    d = ~c;
 }
 

@@ -19,6 +19,8 @@ void set_hash_datatype_from_type_node(HashEntry *entry, AstNode *type_node);
 enum DataType eval_symbol(HashEntry *symbol);
 enum DataType eval_arith_op(enum DataType t1, enum DataType t2);
 enum DataType eval_test_op(enum DataType t1, enum DataType t2);
+enum DataType eval_bool_test_op(enum DataType t1, enum DataType t2);
+enum DataType eval_not_op(enum DataType type);
 
 void print_redeclaration_error(char *identifier_name);
 void print_undeclared_error(char *identifier_name);
@@ -77,6 +79,13 @@ enum DataType check_nodes(AstNode *node) {
         case AST_EQ:
         case AST_DIF:
             node_eval = eval_test_op(children_eval[0], children_eval[1]);
+            break;
+        case AST_AND:
+        case AST_OR:
+            node_eval = eval_bool_test_op(children_eval[0], children_eval[1]);
+            break;
+        case AST_NOT:
+            node_eval = eval_not_op(children_eval[0]);
             break;
         default:
             break;
@@ -219,6 +228,32 @@ enum DataType eval_test_op(enum DataType t1, enum DataType t2) {
 
     if ((is_char_or_int(t1) && is_char_or_int(t2))
             || (t1 == DATATYPE_REAL && t2 == DATATYPE_REAL)) {
+        eval = DATATYPE_BOOL;
+    } else {
+        print_op_type_error();
+        semantic_errors++;
+    }
+
+    return eval;
+}
+
+enum DataType eval_bool_test_op(enum DataType t1, enum DataType t2) {
+    enum DataType eval = DATATYPE_UNKNOWN;
+
+    if (t1 == DATATYPE_BOOL && t2 == DATATYPE_BOOL) {
+        eval = DATATYPE_BOOL;
+    } else {
+        print_op_type_error();
+        semantic_errors++;
+    }
+
+    return eval;
+}
+
+enum DataType eval_not_op(enum DataType type) {
+    enum DataType eval = DATATYPE_UNKNOWN;
+
+    if (type == DATATYPE_BOOL) {
         eval = DATATYPE_BOOL;
     } else {
         print_op_type_error();
