@@ -30,10 +30,10 @@ void check_and_set_declarations(AstNode *node) {
         if (is_redeclared(identifier_node->symbol)) {
             print_redeclaration_error(identifier_node->symbol->string);
             semantic_errors++;
-        } else {
-            set_hash_type_from_decl_node(identifier_node->symbol, node);
-            set_hash_datatype_from_type_node(identifier_node->symbol, type_node);
         }
+
+        set_hash_type_from_decl_node(identifier_node->symbol, node);
+        set_hash_datatype_from_type_node(identifier_node->symbol, type_node);
     }
 
     for (int i = 0; i < MAX_CHILDREN; i++)
@@ -50,7 +50,8 @@ int is_declaration(AstNode *node) {
     return (node_type == AST_VAR_DECL) 
         || (node_type == AST_VEC_DECL)
         || (node_type == AST_VEC_DECL_DEF)
-        || (node_type == AST_FUNC_DECL);
+        || (node_type == AST_FUNC_DECL)
+        || (node_type == AST_PARAM);
 }
 
 int is_redeclared(HashEntry *entry) {
@@ -66,6 +67,7 @@ void set_hash_type_from_decl_node(HashEntry *entry, AstNode *decl_node) {
 
     switch (node_type) {
         case AST_VAR_DECL:
+        case AST_PARAM:
             type = SYMBOL_VARIABLE;
             break;
         case AST_VEC_DECL:
@@ -117,5 +119,6 @@ void print_redeclaration_error(char *identifier_name) {
 }
 
 void print_uncaught_parser_error() {
-    fprintf(stderr, "Uncaught parser error\n");
+    fprintf(stderr, "Parser bug\n");
 }
+

@@ -35,6 +35,9 @@ int main(int argc, char** argv) {
     decompile(ast_root, argv[2]);
     print_hash();
 
+    // Debug
+    fprintf(stderr, "Semantic errors: %d\n", semantic_errors);
+
     if (semantic_errors > 0)
         exit(4);
 
