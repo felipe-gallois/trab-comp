@@ -18,10 +18,11 @@ void set_hash_datatype_from_type_node(HashEntry *entry, AstNode *type_node);
 
 enum DataType eval_symbol(HashEntry *symbol);
 enum DataType eval_arith_op(enum DataType t1, enum DataType t2);
+enum DataType eval_test_op(enum DataType t1, enum DataType t2);
 
 void print_redeclaration_error(char *identifier_name);
 void print_undeclared_error(char *identifier_name);
-void print_arith_op_type_error();
+void print_op_type_error();
 void print_uncaught_parser_error();
 
 void check_and_set_declarations(AstNode *node) {
@@ -68,6 +69,14 @@ enum DataType check_nodes(AstNode *node) {
         case AST_MUL:
         case AST_DIV:
             node_eval = eval_arith_op(children_eval[0], children_eval[1]);
+            break;
+        case AST_LESS:
+        case AST_GREATER:
+        case AST_LE:
+        case AST_GE:
+        case AST_EQ:
+        case AST_DIF:
+            node_eval = eval_test_op(children_eval[0], children_eval[1]);
             break;
         default:
             break;
@@ -198,7 +207,21 @@ enum DataType eval_arith_op(enum DataType t1, enum DataType t2) {
     } else if (t1 == DATATYPE_REAL && t2 == DATATYPE_REAL) {
         eval = DATATYPE_REAL;
     } else {
-        print_arith_op_type_error();
+        print_op_type_error();
+        semantic_errors++;
+    }
+
+    return eval;
+}
+
+enum DataType eval_test_op(enum DataType t1, enum DataType t2) {
+    enum DataType eval = DATATYPE_UNKNOWN;
+
+    if ((is_char_or_int(t1) && is_char_or_int(t2))
+            || (t1 == DATATYPE_REAL && t2 == DATATYPE_REAL)) {
+        eval = DATATYPE_BOOL;
+    } else {
+        print_op_type_error();
         semantic_errors++;
     }
 
@@ -217,9 +240,9 @@ void print_undeclared_error(char *identifier_name) {
             identifier_name);
 }
 
-void print_arith_op_type_error() {
+void print_op_type_error() {
     fprintf(stderr,
-            "Semantic error: arithmetic operation has invalid operand types\n");
+            "Semantic error: operation has invalid operand types\n");
 }
 
 void print_uncaught_parser_error() {
