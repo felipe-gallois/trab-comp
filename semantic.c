@@ -31,6 +31,7 @@ enum DataType eval_vec_exp(AstNode *identifier, AstNode *index);
 enum DataType eval_func_exp(AstNode *identifier, AstNode *args_list);
 enum DataType eval_lit_list(enum DataType t1, enum DataType t2);
 enum DataType eval_var_attrib(enum DataType identifier_type, enum DataType expr_type);
+enum DataType eval_vec_attrib(AstNode *identifier, AstNode *index, enum DataType expr_datatype);
 enum DataType eval_par(enum DataType type);
 
 void print_redeclaration_error(char *identifier_name);
@@ -124,6 +125,13 @@ enum DataType check_nodes(AstNode *node) {
             break;
         case AST_VAR_ATTRIB:
             node_eval = eval_var_attrib(children_eval[0], children_eval[1]);
+            break;
+        case AST_VEC_ATTRIB:
+            node_eval = eval_vec_attrib(
+                    node->children[0],
+                    node->children[1],
+                    children_eval[2]
+            );
             break;
         case AST_PAR:
             node_eval = eval_par(children_eval[0]);
@@ -428,6 +436,25 @@ enum DataType eval_var_attrib(
         enum DataType expr_type) {
     if (!is_compatible(identifier_type, expr_type)) {
         print_type_error();
+        semantic_errors++;
+    }
+
+    return DATATYPE_UNKNOWN;
+}
+
+enum DataType eval_vec_attrib(
+        AstNode *identifier,
+        AstNode *index,
+        enum DataType expr_datatype) {
+    enum DataType identifier_datatype = identifier->symbol->datatype;
+
+    if (!is_compatible(identifier_datatype, expr_datatype)) {
+        print_type_error();
+        semantic_errors++;
+    }
+
+    if (!is_within_bounds(identifier, index)) {
+        print_out_of_bounds_error();
         semantic_errors++;
     }
 
