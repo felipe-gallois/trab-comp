@@ -21,11 +21,14 @@ enum DataType eval_arith_op(enum DataType t1, enum DataType t2);
 enum DataType eval_test_op(enum DataType t1, enum DataType t2);
 enum DataType eval_bool_test_op(enum DataType t1, enum DataType t2);
 enum DataType eval_not_op(enum DataType type);
+enum DataType eval_vec_exp(enum DataType symbol_type, enum DataType expr_type);
 enum DataType eval_lit_list(enum DataType t1, enum DataType t2);
+enum DataType eval_par(enum DataType type);
 
 void print_redeclaration_error(char *identifier_name);
 void print_undeclared_error(char *identifier_name);
 void print_type_error();
+void print_out_of_bounds_error();
 void print_uncaught_parser_error();
 
 void check_and_set_declarations(AstNode *node) {
@@ -89,10 +92,13 @@ enum DataType check_nodes(AstNode *node) {
             node_eval = eval_not_op(children_eval[0]);
             break;
         case AST_VEC_EXP:
-            // node_eval = eval_vec_exp(children_eval[0], children_eval[1]);
+            node_eval = eval_vec_exp(children_eval[0], children_eval[1]);
             break;
         case AST_LIT_LIST:
             node_eval = eval_lit_list(children_eval[0], children_eval[1]);
+            break;
+        case AST_PAR:
+            node_eval = eval_par(children_eval[0]);
             break;
         default:
             break;
@@ -270,27 +276,28 @@ enum DataType eval_not_op(enum DataType type) {
     return eval;
 }
 
-/*
 enum DataType eval_vec_exp(enum DataType symbol_type, enum DataType expr_type) {
     enum DataType eval = DATATYPE_UNKNOWN;
 
     if (is_char_or_int(expr_type)) {
+        eval = symbol_type; // FIXME
+        /*
         if (is_within_bounds()) {
             eval = symbol_type;
         } else {
-            print_op_type_error();
+            print_out_of_bounds_error();
             semantic_errors++;
         }
+        */
     } else {
-        print_op_type_error();
+        print_type_error();
         semantic_errors++;
     }
 
     return eval;
 }
-*/
 
-// Deixa AST_VEC_EXP avaliar tipos
+// Deixa AST_VEC_DECL avaliar tipos
 enum DataType eval_lit_list(enum DataType t1, enum DataType t2) {
     enum DataType eval = DATATYPE_UNKNOWN;
 
@@ -300,6 +307,10 @@ enum DataType eval_lit_list(enum DataType t1, enum DataType t2) {
     }
 
     return eval;
+}
+
+enum DataType eval_par(enum DataType type) {
+    return type;
 }
 
 void print_redeclaration_error(char *identifier_name) {
@@ -317,6 +328,11 @@ void print_undeclared_error(char *identifier_name) {
 void print_type_error() {
     fprintf(stderr,
             "Semantic error: unexpected data types\n");
+}
+
+void print_out_of_bounds_error() {
+    fprintf(stderr,
+            "Semantic error: attempted to access out-of-bounds index\n");
 }
 
 void print_uncaught_parser_error() {
