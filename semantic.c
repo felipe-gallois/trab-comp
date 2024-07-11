@@ -27,12 +27,15 @@ enum DataType eval_test_op(enum DataType t1, enum DataType t2);
 enum DataType eval_bool_test_op(enum DataType t1, enum DataType t2);
 enum DataType eval_not_op(enum DataType type);
 enum DataType eval_vec_exp(AstNode *identifier, AstNode *index);
+enum DataType eval_func_exp(AstNode *identifier, AstNode *args_list);
 enum DataType eval_lit_list(enum DataType t1, enum DataType t2);
 enum DataType eval_par(enum DataType type);
 
 void print_redeclaration_error(char *identifier_name);
 void print_undeclared_error(char *identifier_name);
 void print_type_error();
+void print_arg_size_too_small_error();
+void print_arg_size_too_big_error();
 void print_out_of_bounds_error();
 void print_uncaught_parser_error();
 
@@ -111,6 +114,9 @@ enum DataType check_nodes(AstNode *node) {
         case AST_VEC_EXP:
             node_eval = eval_vec_exp(node->children[0], node->children[1]);
             break;
+        case AST_FUNC_EXP:
+            node_eval = eval_func_exp(node->children[0], node->children[1]);
+            break;
         case AST_LIT_LIST:
             node_eval = eval_lit_list(children_eval[0], children_eval[1]);
             break;
@@ -163,6 +169,17 @@ int is_within_bounds(AstNode *identifier, AstNode *index) {
     } else {
         return 0;
     }
+}
+
+int mismatched_param_types(
+        enum DataType identifier_datatype,
+        enum DataType arg_datatype) {
+    if ((is_char_or_int(identifier_datatype) && is_char_or_int(arg_datatype))
+            || (identifier_datatype == arg_datatype)) {
+        return 0;
+    }
+
+    return 1;
 }
 
 void set_hash_type_from_decl_node(HashEntry *entry, AstNode *decl_node) {
@@ -373,6 +390,36 @@ enum DataType eval_vec_exp(AstNode *identifier, AstNode *index) {
     return eval;
 }
 
+enum DataType eval_func_exp(AstNode *identifier, AstNode *args_list) {
+    enum DataType eval = DATATYPE_UNKNOWN;
+
+    TypeList *id_type = identifier->symbol->parameters;
+    AstNode *arg = args_list;
+
+    while ((id_type != NULL) && (arg != NULL)) {
+        if (mismatched_param_types(id_type->type, check_nodes(arg->children[0]))) {
+            print_type_error();
+            semantic_errors++;
+            break;
+        }
+    
+        id_type = id_type->next;
+        arg = arg->children[1];
+    }
+
+    if ((id_type == NULL) && (arg == NULL)) {
+        eval = identifier->symbol->datatype;
+    } else if (id_type == NULL) {
+        print_arg_size_too_big_error();
+        semantic_errors++;
+    } else if (arg == NULL) {
+        print_arg_size_too_small_error();
+        semantic_errors++;
+    }
+
+    return eval;
+}
+
 // Deixa AST_VEC_DECL avaliar tipos
 enum DataType eval_lit_list(enum DataType t1, enum DataType t2) {
     enum DataType eval = DATATYPE_UNKNOWN;
@@ -404,6 +451,16 @@ void print_undeclared_error(char *identifier_name) {
 void print_type_error() {
     fprintf(stderr,
             "Semantic error: unexpected data type\n");
+}
+
+void print_arg_size_too_small_error() {
+    fprintf(stderr,
+            "Semantic error: too little arguments\n");
+}
+
+void print_arg_size_too_big_error() {
+    fprintf(stderr,
+            "Semantic error: too many arguments\n");
 }
 
 void print_out_of_bounds_error() {
