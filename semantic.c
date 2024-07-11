@@ -14,6 +14,7 @@ int is_redeclared(HashEntry *entry);
 int is_vector_decl(AstNode *node);
 int is_func_decl(AstNode *node);
 int is_char_or_int(enum DataType data_type);
+int is_compatible(enum DataType t1, enum DataType t2);
 int is_within_bounds(AstNode *identifier, AstNode *index);
 
 void set_hash_type_from_decl_node(HashEntry *entry, AstNode *decl_node);
@@ -29,6 +30,7 @@ enum DataType eval_not_op(enum DataType type);
 enum DataType eval_vec_exp(AstNode *identifier, AstNode *index);
 enum DataType eval_func_exp(AstNode *identifier, AstNode *args_list);
 enum DataType eval_lit_list(enum DataType t1, enum DataType t2);
+enum DataType eval_var_attrib(enum DataType identifier_type, enum DataType expr_type);
 enum DataType eval_par(enum DataType type);
 
 void print_redeclaration_error(char *identifier_name);
@@ -120,6 +122,9 @@ enum DataType check_nodes(AstNode *node) {
         case AST_LIT_LIST:
             node_eval = eval_lit_list(children_eval[0], children_eval[1]);
             break;
+        case AST_VAR_ATTRIB:
+            node_eval = eval_var_attrib(children_eval[0], children_eval[1]);
+            break;
         case AST_PAR:
             node_eval = eval_par(children_eval[0]);
             break;
@@ -160,6 +165,11 @@ int is_char_or_int(enum DataType data_type) {
     return (data_type == DATATYPE_CHAR) || (data_type == DATATYPE_INT);
 }
 
+int is_compatible(enum DataType t1, enum DataType t2) {
+    return (t1 == t2)
+        || (is_char_or_int(t1) && is_char_or_int(t2));
+}
+
 int is_within_bounds(AstNode *identifier, AstNode *index) {
     // FIXME: index could also be a char
     unsigned long idx = strtoul(index->symbol->string, NULL, 10);
@@ -169,17 +179,6 @@ int is_within_bounds(AstNode *identifier, AstNode *index) {
     } else {
         return 0;
     }
-}
-
-int mismatched_param_types(
-        enum DataType identifier_datatype,
-        enum DataType arg_datatype) {
-    if ((is_char_or_int(identifier_datatype) && is_char_or_int(arg_datatype))
-            || (identifier_datatype == arg_datatype)) {
-        return 0;
-    }
-
-    return 1;
 }
 
 void set_hash_type_from_decl_node(HashEntry *entry, AstNode *decl_node) {
@@ -371,14 +370,10 @@ enum DataType eval_not_op(enum DataType type) {
 }
 
 enum DataType eval_vec_exp(AstNode *identifier, AstNode *index) {
-    enum DataType eval = DATATYPE_UNKNOWN;
-
     enum SymbolType index_type = index->symbol->type;
 
     if ((index_type == SYMBOL_LIT_INT) || (index_type == SYMBOL_LIT_CHAR)) {
-        if (is_within_bounds(identifier, index)) {
-            eval = identifier->type;
-        } else {
+        if (!is_within_bounds(identifier, index)) {
             print_out_of_bounds_error();
             semantic_errors++;
         }
@@ -387,17 +382,15 @@ enum DataType eval_vec_exp(AstNode *identifier, AstNode *index) {
         semantic_errors++;
     }
 
-    return eval;
+    return identifier->symbol->datatype;
 }
 
 enum DataType eval_func_exp(AstNode *identifier, AstNode *args_list) {
-    enum DataType eval = DATATYPE_UNKNOWN;
-
     TypeList *id_type = identifier->symbol->parameters;
     AstNode *arg = args_list;
 
     while ((id_type != NULL) && (arg != NULL)) {
-        if (mismatched_param_types(id_type->type, check_nodes(arg->children[0]))) {
+        if (!is_compatible(id_type->type, check_nodes(arg->children[0]))) {
             print_type_error();
             semantic_errors++;
             break;
@@ -407,17 +400,15 @@ enum DataType eval_func_exp(AstNode *identifier, AstNode *args_list) {
         arg = arg->children[1];
     }
 
-    if ((id_type == NULL) && (arg == NULL)) {
-        eval = identifier->symbol->datatype;
-    } else if (id_type == NULL) {
+    if ((id_type == NULL) && (arg != NULL)) {
         print_arg_size_too_big_error();
         semantic_errors++;
-    } else if (arg == NULL) {
+    } else if ((id_type != NULL) && (arg == NULL)) {
         print_arg_size_too_small_error();
         semantic_errors++;
     }
 
-    return eval;
+    return identifier->symbol->datatype;
 }
 
 // Deixa AST_VEC_DECL avaliar tipos
@@ -430,6 +421,17 @@ enum DataType eval_lit_list(enum DataType t1, enum DataType t2) {
     }
 
     return eval;
+}
+
+enum DataType eval_var_attrib(
+        enum DataType identifier_type,
+        enum DataType expr_type) {
+    if (!is_compatible(identifier_type, expr_type)) {
+        print_type_error();
+        semantic_errors++;
+    }
+
+    return DATATYPE_UNKNOWN;
 }
 
 enum DataType eval_par(enum DataType type) {
