@@ -22,6 +22,7 @@ int main() {
     d = ~c;
     b = v[1.5];
     v[5] = 2.5;
+    print float 100;
 
     // Fora dos limites
     b = v[10];

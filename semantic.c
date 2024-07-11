@@ -17,6 +17,8 @@ int is_char_or_int(enum DataType data_type);
 int is_compatible(enum DataType t1, enum DataType t2);
 int is_within_bounds(AstNode *identifier, AstNode *index);
 
+enum DataType kw_to_datatype(AstNode *type);
+
 void set_hash_type_from_decl_node(HashEntry *entry, AstNode *decl_node);
 void set_hash_datatype_from_type_node(HashEntry *entry, AstNode *type_node);
 void set_hash_capacity(HashEntry *identifier, HashEntry *capacity);
@@ -32,6 +34,7 @@ enum DataType eval_func_exp(AstNode *identifier, AstNode *args_list);
 enum DataType eval_lit_list(enum DataType t1, enum DataType t2);
 enum DataType eval_var_attrib(enum DataType identifier_type, enum DataType expr_type);
 enum DataType eval_vec_attrib(AstNode *identifier, AstNode *index, enum DataType expr_datatype);
+enum DataType eval_print_lit(AstNode *type, enum DataType expr);
 enum DataType eval_par(enum DataType type);
 
 void print_redeclaration_error(char *identifier_name);
@@ -133,6 +136,9 @@ enum DataType check_nodes(AstNode *node) {
                     children_eval[2]
             );
             break;
+        case AST_PRINT_LIT:
+            node_eval = eval_print_lit(node->children[0], children_eval[1]);
+            break;
         case AST_PAR:
             node_eval = eval_par(children_eval[0]);
             break;
@@ -186,6 +192,21 @@ int is_within_bounds(AstNode *identifier, AstNode *index) {
         return 1;
     } else {
         return 0;
+    }
+}
+
+enum DataType kw_to_datatype(AstNode *type) {
+    switch (type->type) {
+        case AST_INT:
+            return DATATYPE_INT;
+        case AST_FLOAT:
+            return DATATYPE_REAL;
+        case AST_CHAR:
+            return DATATYPE_CHAR;
+        case AST_BOOL:
+            return DATATYPE_BOOL;
+        default:
+            return DATATYPE_UNKNOWN;
     }
 }
 
@@ -455,6 +476,17 @@ enum DataType eval_vec_attrib(
 
     if (!is_within_bounds(identifier, index)) {
         print_out_of_bounds_error();
+        semantic_errors++;
+    }
+
+    return DATATYPE_UNKNOWN;
+}
+
+enum DataType eval_print_lit(AstNode *type, enum DataType expr) {
+    enum DataType kw_datatype = kw_to_datatype(type);
+
+    if (!is_compatible(kw_datatype, expr)) {
+        print_type_error();
         semantic_errors++;
     }
 
