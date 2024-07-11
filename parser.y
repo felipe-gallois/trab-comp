@@ -170,7 +170,7 @@ expr: literal       { $$ = $1; }
     | '~' expr     { $$ = ast_create(AST_NOT, 0, $2, 0, 0, 0); }
     ;
 
-literal_list: literal       { $$ = ast_create(AST_LIT_LIST, 0, $1, 0, 0, 0); }
+literal_list: literal       { $$ = $1; }
             | literal literal_list      { $$ = ast_create(AST_LIT_LIST, 0, $1, $2, 0, 0); }
             ;
 

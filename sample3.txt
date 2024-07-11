@@ -6,6 +6,8 @@ float c:50;
 
 bool d:false;
 
+int v[10]: 'a' 0'b'0 0 2.5 0 0 0 0;
+
 int main() {
     a = a + b;
 

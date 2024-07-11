@@ -21,10 +21,11 @@ enum DataType eval_arith_op(enum DataType t1, enum DataType t2);
 enum DataType eval_test_op(enum DataType t1, enum DataType t2);
 enum DataType eval_bool_test_op(enum DataType t1, enum DataType t2);
 enum DataType eval_not_op(enum DataType type);
+enum DataType eval_lit_list(enum DataType t1, enum DataType t2);
 
 void print_redeclaration_error(char *identifier_name);
 void print_undeclared_error(char *identifier_name);
-void print_op_type_error();
+void print_type_error();
 void print_uncaught_parser_error();
 
 void check_and_set_declarations(AstNode *node) {
@@ -86,6 +87,12 @@ enum DataType check_nodes(AstNode *node) {
             break;
         case AST_NOT:
             node_eval = eval_not_op(children_eval[0]);
+            break;
+        case AST_VEC_EXP:
+            // node_eval = eval_vec_exp(children_eval[0], children_eval[1]);
+            break;
+        case AST_LIT_LIST:
+            node_eval = eval_lit_list(children_eval[0], children_eval[1]);
             break;
         default:
             break;
@@ -216,7 +223,7 @@ enum DataType eval_arith_op(enum DataType t1, enum DataType t2) {
     } else if (t1 == DATATYPE_REAL && t2 == DATATYPE_REAL) {
         eval = DATATYPE_REAL;
     } else {
-        print_op_type_error();
+        print_type_error();
         semantic_errors++;
     }
 
@@ -230,7 +237,7 @@ enum DataType eval_test_op(enum DataType t1, enum DataType t2) {
             || (t1 == DATATYPE_REAL && t2 == DATATYPE_REAL)) {
         eval = DATATYPE_BOOL;
     } else {
-        print_op_type_error();
+        print_type_error();
         semantic_errors++;
     }
 
@@ -243,7 +250,7 @@ enum DataType eval_bool_test_op(enum DataType t1, enum DataType t2) {
     if (t1 == DATATYPE_BOOL && t2 == DATATYPE_BOOL) {
         eval = DATATYPE_BOOL;
     } else {
-        print_op_type_error();
+        print_type_error();
         semantic_errors++;
     }
 
@@ -256,8 +263,40 @@ enum DataType eval_not_op(enum DataType type) {
     if (type == DATATYPE_BOOL) {
         eval = DATATYPE_BOOL;
     } else {
+        print_type_error();
+        semantic_errors++;
+    }
+
+    return eval;
+}
+
+/*
+enum DataType eval_vec_exp(enum DataType symbol_type, enum DataType expr_type) {
+    enum DataType eval = DATATYPE_UNKNOWN;
+
+    if (is_char_or_int(expr_type)) {
+        if (is_within_bounds()) {
+            eval = symbol_type;
+        } else {
+            print_op_type_error();
+            semantic_errors++;
+        }
+    } else {
         print_op_type_error();
         semantic_errors++;
+    }
+
+    return eval;
+}
+*/
+
+// Deixa AST_VEC_EXP avaliar tipos
+enum DataType eval_lit_list(enum DataType t1, enum DataType t2) {
+    enum DataType eval = DATATYPE_UNKNOWN;
+
+    if ((is_char_or_int(t1) && is_char_or_int(t2))
+            || (t1 == t2)) {
+        eval = t1;
     }
 
     return eval;
@@ -275,9 +314,9 @@ void print_undeclared_error(char *identifier_name) {
             identifier_name);
 }
 
-void print_op_type_error() {
+void print_type_error() {
     fprintf(stderr,
-            "Semantic error: operation has invalid operand types\n");
+            "Semantic error: unexpected data types\n");
 }
 
 void print_uncaught_parser_error() {
