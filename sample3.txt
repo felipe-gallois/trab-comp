@@ -24,6 +24,7 @@ int main() {
     v[5] = 2.5;
     print float 100;
     read int c;
+    if (b) {}
 
     // Fora dos limites
     b = v[10];
