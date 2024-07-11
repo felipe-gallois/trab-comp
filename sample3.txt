@@ -23,6 +23,7 @@ int main() {
     b = v[1.5];
     v[5] = 2.5;
     print float 100;
+    read int c;
 
     // Fora dos limites
     b = v[10];

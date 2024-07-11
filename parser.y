@@ -133,7 +133,7 @@ variable_attribution: identifier '=' expr';'        { $$ = ast_create(AST_VAR_AT
 vector_attribution: identifier'['expr']' '=' expr';'        { $$ = ast_create(AST_VEC_ATTRIB, 0, $1, $3, $6, 0); }
                   ;
 
-read_command: KW_READ type expr';'      { $$ = ast_create(AST_READ, 0, $2, $3, 0, 0); }
+read_command: KW_READ type identifier';'      { $$ = ast_create(AST_READ, 0, $2, $3, 0, 0); }
             ;
 
 print_command: KW_PRINT string_lit';'     { $$ = ast_create(AST_PRINT_STRING, 0, $2, 0, 0, 0); }

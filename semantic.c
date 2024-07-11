@@ -34,7 +34,7 @@ enum DataType eval_func_exp(AstNode *identifier, AstNode *args_list);
 enum DataType eval_lit_list(enum DataType t1, enum DataType t2);
 enum DataType eval_var_attrib(enum DataType identifier_type, enum DataType expr_type);
 enum DataType eval_vec_attrib(AstNode *identifier, AstNode *index, enum DataType expr_datatype);
-enum DataType eval_print_lit(AstNode *type, enum DataType expr);
+enum DataType eval_io_command(AstNode *type, enum DataType expr);
 enum DataType eval_par(enum DataType type);
 
 void print_redeclaration_error(char *identifier_name);
@@ -137,7 +137,8 @@ enum DataType check_nodes(AstNode *node) {
             );
             break;
         case AST_PRINT_LIT:
-            node_eval = eval_print_lit(node->children[0], children_eval[1]);
+        case AST_READ:
+            node_eval = eval_io_command(node->children[0], children_eval[1]);
             break;
         case AST_PAR:
             node_eval = eval_par(children_eval[0]);
@@ -482,7 +483,7 @@ enum DataType eval_vec_attrib(
     return DATATYPE_UNKNOWN;
 }
 
-enum DataType eval_print_lit(AstNode *type, enum DataType expr) {
+enum DataType eval_io_command(AstNode *type, enum DataType expr) {
     enum DataType kw_datatype = kw_to_datatype(type);
 
     if (!is_compatible(kw_datatype, expr)) {
