@@ -27,9 +27,16 @@ enum DataType {
     DATATYPE_STRING,
 };
 
+typedef struct TypeList {
+    enum DataType type;
+    struct TypeList *next;
+} TypeList;
+
 typedef struct HashEntry {
     enum SymbolType type;
     enum DataType datatype;
+    unsigned long capacity;
+    TypeList *parameters;
     char *string;
     struct HashEntry *next;
 } HashEntry;

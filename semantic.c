@@ -11,17 +11,22 @@ int semantic_errors = 0;
 
 int is_declaration(AstNode *node);
 int is_redeclared(HashEntry *entry);
+int is_vector_decl(AstNode *node);
+int is_func_decl(AstNode *node);
 int is_char_or_int(enum DataType data_type);
+int is_within_bounds(AstNode *identifier, AstNode *index);
 
 void set_hash_type_from_decl_node(HashEntry *entry, AstNode *decl_node);
 void set_hash_datatype_from_type_node(HashEntry *entry, AstNode *type_node);
+void set_hash_capacity(HashEntry *identifier, HashEntry *capacity);
+void set_hash_param_from_param_list_node(AstNode *param_list, TypeList **insert_place);
 
 enum DataType eval_symbol(HashEntry *symbol);
 enum DataType eval_arith_op(enum DataType t1, enum DataType t2);
 enum DataType eval_test_op(enum DataType t1, enum DataType t2);
 enum DataType eval_bool_test_op(enum DataType t1, enum DataType t2);
 enum DataType eval_not_op(enum DataType type);
-enum DataType eval_vec_exp(enum DataType symbol_type, enum DataType expr_type);
+enum DataType eval_vec_exp(AstNode *identifier, AstNode *index);
 enum DataType eval_lit_list(enum DataType t1, enum DataType t2);
 enum DataType eval_par(enum DataType type);
 
@@ -34,6 +39,7 @@ void print_uncaught_parser_error();
 void check_and_set_declarations(AstNode *node) {
     AstNode *type_node; 
     AstNode *identifier_node;
+    AstNode *extra_node;
 
     if (node == NULL)
         return;
@@ -49,6 +55,17 @@ void check_and_set_declarations(AstNode *node) {
 
         set_hash_type_from_decl_node(identifier_node->symbol, node);
         set_hash_datatype_from_type_node(identifier_node->symbol, type_node);
+
+        if (is_vector_decl(node)) {
+            extra_node = node->children[2];
+            set_hash_capacity(identifier_node->symbol, extra_node->symbol);
+        } else if (is_func_decl(node)) {
+            extra_node = node->children[2];
+            set_hash_param_from_param_list_node(
+                    extra_node,
+                    &(identifier_node->symbol->parameters)
+            ); 
+        }
     }
 
     for (int i = 0; i < MAX_CHILDREN; i++)
@@ -92,7 +109,7 @@ enum DataType check_nodes(AstNode *node) {
             node_eval = eval_not_op(children_eval[0]);
             break;
         case AST_VEC_EXP:
-            node_eval = eval_vec_exp(children_eval[0], children_eval[1]);
+            node_eval = eval_vec_exp(node->children[0], node->children[1]);
             break;
         case AST_LIT_LIST:
             node_eval = eval_lit_list(children_eval[0], children_eval[1]);
@@ -124,8 +141,28 @@ int is_redeclared(HashEntry *entry) {
     return 1;
 }
 
+int is_vector_decl(AstNode *node) {
+    return (node->type == AST_VEC_DECL)
+        || (node->type == AST_VEC_DECL_DEF);
+}
+
+int is_func_decl(AstNode *node) {
+    return (node->type == AST_FUNC_DECL);
+}
+
 int is_char_or_int(enum DataType data_type) {
     return (data_type == DATATYPE_CHAR) || (data_type == DATATYPE_INT);
+}
+
+int is_within_bounds(AstNode *identifier, AstNode *index) {
+    // FIXME: index could also be a char
+    unsigned long idx = strtoul(index->symbol->string, NULL, 10);
+
+    if (idx < identifier->symbol->capacity) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 void set_hash_type_from_decl_node(HashEntry *entry, AstNode *decl_node) {
@@ -177,6 +214,46 @@ void set_hash_datatype_from_type_node(HashEntry *entry, AstNode *type_node) {
     }
 
     entry->datatype = datatype;
+}
+
+void set_hash_capacity(HashEntry *identifier, HashEntry *capacity) {
+    // FIXME: capacity could also be a char
+    unsigned long cap = strtoul(capacity->string, NULL, 10); 
+    identifier->capacity = cap;
+}
+
+void set_hash_param_from_param_list_node(
+        AstNode *param_list,
+        TypeList **insert_place) {
+    if (param_list != NULL) {
+        TypeList *type_node = (TypeList*) malloc(sizeof(TypeList));
+
+        type_node->next = NULL;
+
+        // switch parameter's type
+        switch (param_list->children[0]->children[0]->type) {
+            case AST_CHAR:
+                type_node->type = DATATYPE_CHAR;
+                break;
+            case AST_INT:
+                type_node->type = DATATYPE_INT;
+                break;
+            case AST_FLOAT:
+                type_node->type = DATATYPE_REAL;
+                break;
+            case AST_BOOL:
+                type_node->type = DATATYPE_BOOL;
+                break;
+        }
+
+        *insert_place = type_node; 
+
+        // recursion
+        set_hash_param_from_param_list_node(
+                param_list->children[1],
+                &(type_node->next)
+        );
+    }
 }
 
 enum DataType eval_symbol(HashEntry *symbol) {
@@ -276,19 +353,18 @@ enum DataType eval_not_op(enum DataType type) {
     return eval;
 }
 
-enum DataType eval_vec_exp(enum DataType symbol_type, enum DataType expr_type) {
+enum DataType eval_vec_exp(AstNode *identifier, AstNode *index) {
     enum DataType eval = DATATYPE_UNKNOWN;
 
-    if (is_char_or_int(expr_type)) {
-        eval = symbol_type; // FIXME
-        /*
-        if (is_within_bounds()) {
-            eval = symbol_type;
+    enum SymbolType index_type = index->symbol->type;
+
+    if ((index_type == SYMBOL_LIT_INT) || (index_type == SYMBOL_LIT_CHAR)) {
+        if (is_within_bounds(identifier, index)) {
+            eval = identifier->type;
         } else {
             print_out_of_bounds_error();
             semantic_errors++;
         }
-        */
     } else {
         print_type_error();
         semantic_errors++;
@@ -327,7 +403,7 @@ void print_undeclared_error(char *identifier_name) {
 
 void print_type_error() {
     fprintf(stderr,
-            "Semantic error: unexpected data types\n");
+            "Semantic error: unexpected data type\n");
 }
 
 void print_out_of_bounds_error() {
