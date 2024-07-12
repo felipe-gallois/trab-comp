@@ -6,7 +6,12 @@ float c:50;
 
 bool d:false;
 
-int v[10]: 'a' 0'b'0 0 2.5 0 0 0 0;
+// Tipo e tamanho errados
+int u[2]: 0 0 1.0;
+int v[10]: 'a' 0'b'0 0 2.5 0 0 0;
+
+// Índice errado
+int w['a'];
 
 int f(int x, int y) {
     return x + y;
@@ -30,9 +35,6 @@ int main() {
     print float 100;
     read int c;
     if (b) {}
-
-    // Fora dos limites
-    b = v[10];
 
     // Poucos argumentos
     b = f(b);
