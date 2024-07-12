@@ -18,6 +18,7 @@ int is_compatible(enum DataType t1, enum DataType t2);
 int is_within_bounds(AstNode *identifier, AstNode *index);
 
 enum DataType kw_to_datatype(AstNode *type);
+void check_return_types(AstNode *command, enum DataType func_type);
 
 void set_hash_type_from_decl_node(HashEntry *entry, AstNode *decl_node);
 void set_hash_datatype_from_type_node(HashEntry *entry, AstNode *type_node);
@@ -37,6 +38,7 @@ enum DataType eval_vec_attrib(AstNode *identifier, AstNode *index, enum DataType
 enum DataType eval_io_command(AstNode *type, enum DataType expr);
 enum DataType eval_conditional_command(enum DataType conditional);
 enum DataType eval_par(enum DataType type);
+enum DataType eval_func_decl(enum DataType func_type, AstNode *command);
 
 void print_redeclaration_error(char *identifier_name);
 void print_undeclared_error(char *identifier_name);
@@ -45,6 +47,7 @@ void print_arg_size_too_small_error();
 void print_arg_size_too_big_error();
 void print_out_of_bounds_error();
 void print_uncaught_parser_error();
+void print_return_type_error();
 
 void check_and_set_declarations(AstNode *node) {
     AstNode *type_node; 
@@ -149,6 +152,9 @@ enum DataType check_nodes(AstNode *node) {
         case AST_PAR:
             node_eval = eval_par(children_eval[0]);
             break;
+        case AST_FUNC_DECL:
+            node_eval = eval_func_decl(children_eval[1], node->children[3]);
+            break;
         default:
             break;
     }
@@ -215,6 +221,23 @@ enum DataType kw_to_datatype(AstNode *type) {
         default:
             return DATATYPE_UNKNOWN;
     }
+}
+
+void check_return_types(AstNode *command, enum DataType func_type) {
+    if (command == NULL)
+        return;
+
+    if (command->type == AST_RET) {
+        enum DataType return_type = check_nodes(command->children[0]);
+
+        if (!is_compatible(return_type, func_type)) {
+            print_return_type_error();
+            semantic_errors++;
+        }
+    }
+
+    for (int i = 0; i < MAX_CHILDREN; i++)
+        check_return_types(command->children[i], func_type);
 }
 
 void set_hash_type_from_decl_node(HashEntry *entry, AstNode *decl_node) {
@@ -513,6 +536,11 @@ enum DataType eval_par(enum DataType type) {
     return type;
 }
 
+enum DataType eval_func_decl(enum DataType func_type, AstNode *command) {
+    check_return_types(command, func_type);
+    return DATATYPE_UNKNOWN;
+}
+
 void print_redeclaration_error(char *identifier_name) {
     fprintf(stderr,
             "Semantic error: redeclaring identifier %s\n",
@@ -543,6 +571,11 @@ void print_arg_size_too_big_error() {
 void print_out_of_bounds_error() {
     fprintf(stderr,
             "Semantic error: attempted to access out-of-bounds index\n");
+}
+
+void print_return_type_error() {
+    fprintf(stderr,
+            "Semantic error: returned type does not match function type\n");
 }
 
 void print_uncaught_parser_error() {

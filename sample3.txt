@@ -12,6 +12,11 @@ int f(int x, int y) {
     return x + y;
 }
 
+int g(float z) {
+    // Tipo de retorno incompatível
+    return z;
+}
+
 int main() {
     a = a + b;
 
