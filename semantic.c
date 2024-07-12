@@ -35,7 +35,7 @@ enum DataType eval_lit_list(enum DataType t1, enum DataType t2);
 enum DataType eval_var_attrib(enum DataType identifier_type, enum DataType expr_type);
 enum DataType eval_vec_attrib(AstNode *identifier, AstNode *index, enum DataType expr_datatype);
 enum DataType eval_io_command(AstNode *type, enum DataType expr);
-enum DataType eval_if_command(enum DataType conditional);
+enum DataType eval_conditional_command(enum DataType conditional);
 enum DataType eval_par(enum DataType type);
 
 void print_redeclaration_error(char *identifier_name);
@@ -143,7 +143,8 @@ enum DataType check_nodes(AstNode *node) {
             break;
         case AST_IF:
         case AST_IF_ELSE:
-            node_eval = eval_if_command(children_eval[0]);
+        case AST_WHILE:
+            node_eval = eval_conditional_command(children_eval[0]);
             break;
         case AST_PAR:
             node_eval = eval_par(children_eval[0]);
@@ -499,7 +500,7 @@ enum DataType eval_io_command(AstNode *type, enum DataType expr) {
     return DATATYPE_UNKNOWN;
 }
 
-enum DataType eval_if_command(enum DataType conditional) {
+enum DataType eval_conditional_command(enum DataType conditional) {
     if (conditional != DATATYPE_BOOL) {
         print_type_error();
         semantic_errors++;
