@@ -2,9 +2,14 @@ char a:10;
 char a:15; // Identificador redeclarado
 
 int b:30;
+
+// Tipo errado
 float c:50;
 
 bool d:false;
+
+// Tipo errado
+bool e:1;
 
 // Tipo e tamanho errados
 int u[2]: 0 0 1.0;

@@ -27,6 +27,7 @@ enum DataType eval_par(enum DataType type);
 enum DataType eval_func_decl(enum DataType func_type, AstNode *command);
 enum DataType eval_vec_decl(AstNode *size);
 enum DataType eval_vec_decl_def(enum DataType vec_type, AstNode *size, AstNode *lit_list);
+enum DataType eval_var_decl(enum DataType identifier_type, enum DataType expr_type);
 
 void set_hash_type_from_decl_node(HashEntry *entry, AstNode *decl_node);
 void set_hash_datatype_from_type_node(HashEntry *entry, AstNode *type_node);
@@ -168,6 +169,9 @@ enum DataType check_nodes(AstNode *node) {
                     node->children[2],
                     node->children[3]
             );
+            break;
+        case AST_VAR_DECL:
+            node_eval = eval_var_decl(children_eval[1], children_eval[2]);
             break;
         default:
             break;
@@ -603,6 +607,15 @@ enum DataType eval_vec_decl_def(
         semantic_errors++;
     } else if (list_size > vec_size) {
         print_list_size_too_big_error();
+        semantic_errors++;
+    }
+
+    return DATATYPE_UNKNOWN;
+}
+
+enum DataType eval_var_decl(enum DataType identifier_type, enum DataType expr_type) {
+    if (!is_compatible(identifier_type, expr_type)) {
+        print_type_error();
         semantic_errors++;
     }
 
