@@ -151,7 +151,7 @@ while_expr: KW_WHILE '('expr')' command     { $$ = ast_create(AST_WHILE, 0, $3, 
           ;
 
 expr: literal       { $$ = $1; }
-    | identifier     { $$ = $1; }
+    | identifier     { $$ = ast_create(AST_VAR_EXP, 0, $1, 0, 0, 0); }
     | identifier'['expr']'       { $$ = ast_create(AST_VEC_EXP, 0, $1, $3, 0, 0); }
     | identifier'('args_list')'      { $$ = ast_create(AST_FUNC_EXP, 0, $1, $3, 0, 0); }
     | '('expr')'        { $$ = ast_create(AST_PAR, 0, $2, 0, 0, 0); }

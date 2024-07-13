@@ -82,6 +82,9 @@ void ast_print_node(AstNode *node, int level) {
         case AST_NOT:
             fprintf(stderr, "AST_NOT");
             break;
+        case AST_VAR_EXP:
+            fprintf(stderr, "AST_VAR_EXP");
+            break;
         case AST_VEC_EXP:
             fprintf(stderr, "AST_VEC_EXP");
             break;

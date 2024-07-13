@@ -17,10 +17,11 @@ enum DataType eval_arith_op(enum DataType t1, enum DataType t2);
 enum DataType eval_test_op(enum DataType t1, enum DataType t2);
 enum DataType eval_bool_test_op(enum DataType t1, enum DataType t2);
 enum DataType eval_not_op(enum DataType type);
-enum DataType eval_vec_exp(AstNode *identifier, enum DataType index_datatype);
-enum DataType eval_func_exp(AstNode *identifier, AstNode *args_list);
-enum DataType eval_var_attrib(enum DataType identifier_type, enum DataType expr_type);
-enum DataType eval_vec_attrib(enum DataType identifier_datatype, enum DataType index_datatype, enum DataType expr_datatype);
+enum DataType eval_var_exp(HashEntry *identifier);
+enum DataType eval_vec_exp(HashEntry *identifier, enum DataType index_datatype);
+enum DataType eval_func_exp(HashEntry *identifier, AstNode *args_list);
+enum DataType eval_var_attrib(HashEntry *identifier, enum DataType expr_type);
+enum DataType eval_vec_attrib(HashEntry *identifier, enum DataType index_datatype, enum DataType expr_datatype);
 enum DataType eval_io_command(AstNode *type, enum DataType expr);
 enum DataType eval_conditional_command(enum DataType conditional);
 enum DataType eval_par(enum DataType type);
@@ -47,10 +48,13 @@ void print_undeclared_error(char *identifier_name);
 void print_type_error();
 void print_arg_size_too_small_error();
 void print_arg_size_too_big_error();
-void print_uncaught_parser_error();
 void print_return_type_error();
 void print_list_size_too_small_error();
 void print_list_size_too_big_error();
+void print_not_var_error();
+void print_not_vec_error();
+void print_not_func_error();
+void print_uncaught_parser_error();
 
 enum DataType kw_to_datatype(AstNode *type);
 enum DataType literal_to_datatype(AstNode *literal);
@@ -129,18 +133,21 @@ enum DataType check_nodes(AstNode *node) {
         case AST_NOT:
             node_eval = eval_not_op(children_eval[0]);
             break;
+        case AST_VAR_EXP:
+            node_eval = eval_var_exp(node->children[0]->symbol);
+            break;
         case AST_VEC_EXP:
-            node_eval = eval_vec_exp(node->children[0], children_eval[1]);
+            node_eval = eval_vec_exp(node->children[0]->symbol, children_eval[1]);
             break;
         case AST_FUNC_EXP:
-            node_eval = eval_func_exp(node->children[0], node->children[1]);
+            node_eval = eval_func_exp(node->children[0]->symbol, node->children[1]);
             break;
         case AST_VAR_ATTRIB:
-            node_eval = eval_var_attrib(children_eval[0], children_eval[1]);
+            node_eval = eval_var_attrib(node->children[0]->symbol, children_eval[1]);
             break;
         case AST_VEC_ATTRIB:
             node_eval = eval_vec_attrib(
-                    children_eval[0],
+                    node->children[0]->symbol,
                     children_eval[1],
                     children_eval[2]
             );
@@ -485,20 +492,40 @@ enum DataType eval_not_op(enum DataType type) {
     return eval;
 }
 
+enum DataType eval_var_exp(HashEntry *identifier) {
+    if (identifier->type != SYMBOL_VARIABLE) {
+        print_not_var_error();
+        semantic_errors++;
+        return DATATYPE_UNKNOWN;
+    }
+
+    return identifier->datatype;
+}
+
 enum DataType eval_vec_exp(
-        AstNode *identifier,
+        HashEntry *identifier,
         enum DataType index_datatype) {
-    if (!is_index(index_datatype)) {
+    if (identifier->type != SYMBOL_VECTOR) {
+        print_not_vec_error();
+        semantic_errors++;
+        return DATATYPE_UNKNOWN;
+    } else if (!is_index(index_datatype)) {
         print_type_error();
         semantic_errors++;
     }
 
-    return identifier->symbol->datatype;
+    return identifier->datatype;
 }
 
-enum DataType eval_func_exp(AstNode *identifier, AstNode *args_list) {
-    TypeList *id_type = identifier->symbol->parameters;
+enum DataType eval_func_exp(HashEntry *identifier, AstNode *args_list) {
+    TypeList *id_type = identifier->parameters;
     AstNode *arg = args_list;
+
+    if (identifier->type != SYMBOL_FUNCTION) {
+        print_not_func_error();
+        semantic_errors++;
+        return DATATYPE_UNKNOWN;
+    }
 
     while ((id_type != NULL) && (arg != NULL)) {
         if (!is_compatible(id_type->type, check_nodes(arg->children[0]))) {
@@ -519,13 +546,16 @@ enum DataType eval_func_exp(AstNode *identifier, AstNode *args_list) {
         semantic_errors++;
     }
 
-    return identifier->symbol->datatype;
+    return identifier->datatype;
 }
 
 enum DataType eval_var_attrib(
-        enum DataType identifier_type,
+        HashEntry *identifier,
         enum DataType expr_type) {
-    if (!is_compatible(identifier_type, expr_type)) {
+    if (identifier->type != SYMBOL_VARIABLE) {
+        print_not_var_error();
+        semantic_errors++;
+    } else if (!is_compatible(identifier->datatype, expr_type)) {
         print_type_error();
         semantic_errors++;
     }
@@ -534,17 +564,22 @@ enum DataType eval_var_attrib(
 }
 
 enum DataType eval_vec_attrib(
-        enum DataType identifier_datatype,
+        HashEntry *identifier,
         enum DataType index_datatype,
         enum DataType expr_datatype) {
-    if (!is_compatible(identifier_datatype, expr_datatype)) {
-        print_type_error();
+    if (identifier->type != SYMBOL_VECTOR) {
+        print_not_vec_error();
         semantic_errors++;
-    }
+    } else {
+        if (!is_compatible(identifier->datatype, expr_datatype)) {
+            print_type_error();
+            semantic_errors++;
+        }
 
-    if (!is_index(index_datatype)) {
-        print_type_error();
-        semantic_errors++;
+        if (!is_index(index_datatype)) {
+            print_type_error();
+            semantic_errors++;
+        }
     }
 
     return DATATYPE_UNKNOWN;
@@ -662,6 +697,21 @@ void print_list_size_too_small_error() {
 void print_list_size_too_big_error() {
     fprintf(stderr,
             "Semantic error: literal list is too large\n");
+}
+
+void print_not_var_error() {
+    fprintf(stderr,
+            "Semantic error: identifier does not correspond to a variable\n");
+}
+
+void print_not_vec_error() {
+    fprintf(stderr,
+            "Semantic error: identifier does not correspond to a vector\n");
+}
+
+void print_not_func_error() {
+    fprintf(stderr,
+            "Semantic error: identifier does not correspond to a function\n");
 }
 
 void print_uncaught_parser_error() {

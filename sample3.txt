@@ -49,5 +49,10 @@ int main() {
 
     // Muitos argumentos
     b = f(b, a, a);
+
+    // Identificadores usados incorretamente
+    a = b[3];
+    a = u(3);
+    a = f;
 }
 
