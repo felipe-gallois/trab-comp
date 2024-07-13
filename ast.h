@@ -26,6 +26,7 @@ enum AstNodeType {
     AST_AND,
     AST_OR,
     AST_NOT,
+    AST_VAR_EXP,
     AST_VEC_EXP,
     AST_FUNC_EXP,
     AST_ARGS_LIST,

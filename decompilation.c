@@ -91,17 +91,20 @@ void decompile_tree(AstNode *node, FILE *out_file) {
             fprintf(out_file, "~");
             decompile_tree(node->children[0], out_file);
             break;
+        case AST_VAR_EXP:
+            decompile_tree(node->children[0], out_file);
+            break;
         case AST_VEC_EXP:
             decompile_tree(node->children[0], out_file);
             fprintf(out_file, "[");
-            decompile_tree(node->children[0], out_file);
+            decompile_tree(node->children[1], out_file);
             fprintf(out_file, "]");
             break;
         case AST_FUNC_EXP:
             decompile_tree(node->children[0], out_file);
             fprintf(out_file, "(");
-            decompile_tree(node->children[0], out_file);
-            fprintf(out_file, ")\n");
+            decompile_tree(node->children[1], out_file);
+            fprintf(out_file, ")");
             break;
         case AST_ARGS_LIST:
             decompile_tree(node->children[0], out_file);
