@@ -8,6 +8,18 @@
 
 enum TacType {
     TAC_SYMBOL,
+    TAC_ADD,
+    TAC_SUB,
+    TAC_MUL,
+    TAC_DIV,
+    TAC_LESS,
+    TAC_GREATER,
+    TAC_LE,
+    TAC_GE,
+    TAC_EQ,
+    TAC_DIF,
+    TAC_AND,
+    TAC_OR,
 };
 
 typedef struct TacNode {

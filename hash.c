@@ -51,6 +51,20 @@ HashEntry *insert_entry(char *string, enum SymbolType type) {
     return new_entry;
 }
 
+HashEntry *makeTemp() {
+    static int serial = 0;
+
+    HashEntry *result;
+    char buffer[256] = "";
+
+    sprintf(buffer, "_temp%d", serial);
+
+    result = insert_entry(buffer, SYMBOL_TEMP);
+    serial++;
+
+    return result;
+}
+
 void print_hash() {
     for (int i = 0; i < HASH_SIZE; i++) {
         for (HashEntry *entry = table[i]; entry; entry = entry->next)

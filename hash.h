@@ -16,6 +16,7 @@ enum SymbolType {
     SYMBOL_VARIABLE,
     SYMBOL_VECTOR,
     SYMBOL_FUNCTION,
+    SYMBOL_TEMP,
 };
 
 enum DataType {
@@ -45,6 +46,7 @@ void hash_init();
 int get_address(char *string);
 HashEntry *find_entry(char *string);
 HashEntry *insert_entry(char *string, enum SymbolType type);
+HashEntry *makeTemp();
 void print_hash();
 
 #endif
