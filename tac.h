@@ -1,0 +1,25 @@
+// UFRGS - Compiladores - Felipe Gallois - 2024/1
+
+#ifndef TAC_H
+#define TAC_H
+
+#include "hash.h"
+#include "ast.h"
+
+enum TacType {
+    TAC_SYMBOL,
+};
+
+typedef struct TacNode {
+    enum TacType type;
+    HashEntry *res;
+    HashEntry *op1;
+    HashEntry *op2;
+    struct TacNode *neigh;
+} TacNode;
+
+TacNode *generate_code(AstNode *node);
+TacNode *tac_reverse_list(TacNode *list);
+void tac_print(TacNode *list);
+
+#endif

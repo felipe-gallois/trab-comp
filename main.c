@@ -7,6 +7,7 @@
 #include "ast.h"
 #include "semantic.h"
 #include "decompilation.h"
+#include "tac.h"
 
 extern int semantic_errors;
 extern FILE *yyin;
@@ -33,6 +34,7 @@ int main(int argc, char** argv) {
     check_and_set_declarations(ast_root);
     check_nodes(ast_root);
     decompile(ast_root, argv[2]);
+    tac_print(tac_reverse_list(generate_code(ast_root)));
     print_hash();
 
     // Debug
