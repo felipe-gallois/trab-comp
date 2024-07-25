@@ -20,9 +20,11 @@ static char *tac_strings[] = {
     "TAC_DIF",
     "TAC_AND",
     "TAC_OR",
+    "TAC_NOT",
 };
 
 TacNode *generate_binary_op(enum TacType type, TacNode *children_code[]);
+TacNode *generate_unary_op(enum TacType type, TacNode *children_code[]);
 TacNode *generate_default(TacNode *children_code[]);
 
 TacNode *tac_create(enum TacType type, HashEntry *res, HashEntry *op1,
@@ -79,6 +81,9 @@ TacNode *generate_code(AstNode *node) {
         case AST_OR:
             result = generate_binary_op(TAC_OR, children_code);
             break;
+        case AST_NOT:
+            result = generate_unary_op(TAC_NOT, children_code);
+            break;
         default:
             result = generate_default(children_code);
             break;
@@ -96,6 +101,17 @@ TacNode *generate_binary_op(enum TacType type, TacNode *children_code[]) {
     );
 
     return tac_join(children_code[0], tac_join(children_code[1], result));
+}
+
+TacNode *generate_unary_op(enum TacType type, TacNode *children_code[]) {
+    TacNode *result = tac_create(
+            type,
+            makeTemp(),
+            children_code[0] ? children_code[0]->res : NULL,
+            NULL
+    );
+
+    return tac_join(children_code[0], result);
 }
 
 TacNode *generate_default(TacNode *children_code[]) {
@@ -167,9 +183,9 @@ void tac_print(TacNode *list) {
             op2 = list->op2;
 
             printf("TAC(%s, ", tac_strings[list->type]);
-            printf("%s, ", res == NULL ? "0" : res->string); 
-            printf("%s, ", op1 == NULL ? "0" : op1->string); 
-            printf("%s)\n", op2 == NULL ? "0" : op2->string); 
+            printf("%s, ", res == NULL ? "NULL" : res->string); 
+            printf("%s, ", op1 == NULL ? "NULL" : op1->string); 
+            printf("%s)\n", op2 == NULL ? "NULL" : op2->string); 
         }
 
         list = list->neigh;

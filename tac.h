@@ -20,6 +20,7 @@ enum TacType {
     TAC_DIF,
     TAC_AND,
     TAC_OR,
+    TAC_NOT,
 };
 
 typedef struct TacNode {
