@@ -22,6 +22,7 @@ enum TacType {
     TAC_OR,
     TAC_NOT,
     TAC_MOVE,
+    TAC_RET,
 };
 
 typedef struct TacNode {
