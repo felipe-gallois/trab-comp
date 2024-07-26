@@ -39,6 +39,7 @@ TacNode *generate_print_lit(TacNode *children_code[]);
 TacNode *generate_read(TacNode *children_code[]);
 TacNode *generate_if(TacNode *children_code[]);
 TacNode *generate_if_else(TacNode *children_code[]);
+TacNode *generate_while(TacNode *children_code[]);
 TacNode *generate_default(TacNode *children_code[]);
 
 TacNode *tac_create(enum TacType type, HashEntry *res, HashEntry *op1,
@@ -120,6 +121,9 @@ TacNode *generate_code(AstNode *node) {
             break;
         case AST_IF_ELSE:
             result = generate_if_else(children_code);
+            break;
+        case AST_WHILE:
+            result = generate_while(children_code);
             break;
         default:
             result = generate_default(children_code);
@@ -271,6 +275,53 @@ TacNode *generate_if_else(TacNode *children_code[]) {
                                 children_code[2],
                                 continue_label
                             )
+                        )
+                    )
+                )
+            )
+    );
+}
+
+TacNode *generate_while(TacNode *children_code[]) {
+    TacNode *test_label = tac_create(
+            TAC_LABEL,
+            makeLabel(),
+            NULL,
+            NULL
+    );
+
+    TacNode *continue_label = tac_create(
+            TAC_LABEL,
+            makeLabel(),
+            NULL,
+            NULL
+    );
+
+    TacNode *test = tac_create(
+            TAC_IFZ,
+            continue_label->res,
+            children_code[0] ? children_code[0]->res : NULL,
+            NULL
+    );
+
+    TacNode *test_jump = tac_create(
+            TAC_JUMP,
+            test_label->res,
+            NULL,
+            NULL
+    );
+
+    return tac_join(
+            children_code[0],
+            tac_join(
+                test_label,
+                tac_join(
+                    test,
+                    tac_join(
+                        children_code[1],
+                        tac_join(
+                            test_jump,
+                            continue_label
                         )
                     )
                 )
