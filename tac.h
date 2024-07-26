@@ -25,6 +25,9 @@ enum TacType {
     TAC_RET,
     TAC_PRINT,
     TAC_READ,
+    TAC_IFZ,
+    TAC_LABEL,
+    TAC_JUMP,
 };
 
 typedef struct TacNode {

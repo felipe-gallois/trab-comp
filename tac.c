@@ -25,6 +25,9 @@ static char *tac_strings[] = {
     "TAC_RET",
     "TAC_PRINT",
     "TAC_READ",
+    "TAC_IFZ",
+    "TAC_LABEL",
+    "TAC_JUMP",
 };
 
 TacNode *generate_binary_op(enum TacType type, TacNode *children_code[]);
@@ -34,6 +37,8 @@ TacNode *generate_return(TacNode *children_code[]);
 TacNode *generate_print_string(TacNode *children_code[]);
 TacNode *generate_print_lit(TacNode *children_code[]);
 TacNode *generate_read(TacNode *children_code[]);
+TacNode *generate_if(TacNode *children_code[]);
+TacNode *generate_if_else(TacNode *children_code[]);
 TacNode *generate_default(TacNode *children_code[]);
 
 TacNode *tac_create(enum TacType type, HashEntry *res, HashEntry *op1,
@@ -109,6 +114,12 @@ TacNode *generate_code(AstNode *node) {
             break;
         case AST_READ:
             result = generate_read(children_code);
+            break;
+        case AST_IF:
+            result = generate_if(children_code);
+            break;
+        case AST_IF_ELSE:
+            result = generate_if_else(children_code);
             break;
         default:
             result = generate_default(children_code);
@@ -193,6 +204,78 @@ TacNode *generate_read(TacNode *children_code[]) {
     );
 
     return tac_join(children_code[1], result);
+}
+
+TacNode *generate_if(TacNode *children_code[]) {
+    TacNode *label = tac_create(
+            TAC_LABEL,
+            makeLabel(),
+            NULL,
+            NULL
+    );
+
+    TacNode *test = tac_create(
+            TAC_IFZ,
+            label->res,
+            children_code[0] ? children_code[0]->res : NULL,
+            NULL
+    );
+
+    return tac_join(
+            children_code[0],
+            tac_join(test,
+                tac_join(children_code[1],
+                    label)));
+}
+
+TacNode *generate_if_else(TacNode *children_code[]) {
+    TacNode *else_label = tac_create(
+            TAC_LABEL,
+            makeLabel(),
+            NULL,
+            NULL
+    );
+
+    TacNode *continue_label = tac_create(
+            TAC_LABEL,
+            makeLabel(),
+            NULL,
+            NULL
+    );
+
+    TacNode *test = tac_create(
+            TAC_IFZ,
+            else_label->res,
+            children_code[0] ? children_code[0]->res : NULL,
+            NULL
+    );
+
+    TacNode *continue_jump = tac_create(
+            TAC_JUMP,
+            continue_label->res,
+            NULL,
+            NULL
+    );
+
+    return tac_join(
+            children_code[0],
+            tac_join(
+                test,
+                tac_join(
+                    children_code[1],
+                    tac_join(
+                        continue_jump,
+                        tac_join(
+                            else_label,
+                            tac_join(
+                                children_code[2],
+                                continue_label
+                            )
+                        )
+                    )
+                )
+            )
+    );
 }
 
 TacNode *generate_default(TacNode *children_code[]) {

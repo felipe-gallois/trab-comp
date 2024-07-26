@@ -65,6 +65,20 @@ HashEntry *makeTemp() {
     return result;
 }
 
+HashEntry *makeLabel() {
+    static int serial = 0;
+
+    HashEntry *result;
+    char buffer[256] = "";
+
+    sprintf(buffer, "_label%d", serial);
+
+    result = insert_entry(buffer, SYMBOL_LABEL);
+    serial++;
+
+    return result;
+}
+
 void print_hash() {
     for (int i = 0; i < HASH_SIZE; i++) {
         for (HashEntry *entry = table[i]; entry; entry = entry->next)
