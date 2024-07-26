@@ -27,6 +27,7 @@ static char *tac_strings[] = {
 TacNode *generate_binary_op(enum TacType type, TacNode *children_code[]);
 TacNode *generate_unary_op(enum TacType type, TacNode *children_code[]);
 TacNode *generate_move(TacNode *children_code[]);
+TacNode *generate_arg(TacNode *children_code[]);
 TacNode *generate_default(TacNode *children_code[]);
 
 TacNode *tac_create(enum TacType type, HashEntry *res, HashEntry *op1,
@@ -86,7 +87,8 @@ TacNode *generate_code(AstNode *node) {
         case AST_NOT:
             result = generate_unary_op(TAC_NOT, children_code);
             break;
-        case AST_VEC_EXP:
+        // TODO: AST_VEC_EXP .. AST_CMD_LIST
+        case AST_VAR_ATTRIB:
             result = generate_move(children_code);
             break;
         default:
@@ -122,9 +124,9 @@ TacNode *generate_unary_op(enum TacType type, TacNode *children_code[]) {
 TacNode *generate_move(TacNode *children_code[]) {
     TacNode *result = tac_create(
             TAC_MOVE,
-            makeTemp(),
             children_code[0] ? children_code[0]->res : NULL,
-            children_code[1] ? children_code[1]->res : NULL
+            children_code[1] ? children_code[1]->res : NULL,
+            NULL
     );
 
     return tac_join(children_code[0], tac_join(children_code[1], result));
