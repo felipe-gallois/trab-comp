@@ -23,12 +23,17 @@ static char *tac_strings[] = {
     "TAC_NOT",
     "TAC_MOVE",
     "TAC_RET",
+    "TAC_PRINT",
+    "TAC_READ",
 };
 
 TacNode *generate_binary_op(enum TacType type, TacNode *children_code[]);
 TacNode *generate_unary_op(enum TacType type, TacNode *children_code[]);
 TacNode *generate_move(TacNode *children_code[]);
 TacNode *generate_return(TacNode *children_code[]);
+TacNode *generate_print_string(TacNode *children_code[]);
+TacNode *generate_print_lit(TacNode *children_code[]);
+TacNode *generate_read(TacNode *children_code[]);
 TacNode *generate_default(TacNode *children_code[]);
 
 TacNode *tac_create(enum TacType type, HashEntry *res, HashEntry *op1,
@@ -96,6 +101,15 @@ TacNode *generate_code(AstNode *node) {
         case AST_RET:
             result = generate_return(children_code);
             break;
+        case AST_PRINT_STRING:
+            result = generate_print_string(children_code);
+            break;
+        case AST_PRINT_LIT:
+            result = generate_print_lit(children_code);
+            break;
+        case AST_READ:
+            result = generate_read(children_code);
+            break;
         default:
             result = generate_default(children_code);
             break;
@@ -146,6 +160,39 @@ TacNode *generate_return(TacNode *children_code[]) {
     );
 
     return tac_join(children_code[0], result);
+}
+
+TacNode *generate_print_string(TacNode *children_code[]) {
+    TacNode *result = tac_create(
+            TAC_PRINT,
+            NULL,
+            children_code[0] ? children_code[0]->res : NULL,
+            NULL
+    );
+
+    return tac_join(children_code[0], result);
+}
+
+TacNode *generate_print_lit(TacNode *children_code[]) {
+    TacNode *result = tac_create(
+            TAC_PRINT,
+            NULL,
+            children_code[1] ? children_code[1]->res : NULL,
+            NULL
+    );
+
+    return tac_join(children_code[1], result);
+}
+
+TacNode *generate_read(TacNode *children_code[]) {
+    TacNode *result = tac_create(
+            TAC_READ,
+            children_code[1] ? children_code[1]->res : NULL,
+            NULL,
+            NULL
+    );
+
+    return tac_join(children_code[1], result);
 }
 
 TacNode *generate_default(TacNode *children_code[]) {
