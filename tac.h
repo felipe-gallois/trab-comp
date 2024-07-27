@@ -22,6 +22,8 @@ enum TacType {
     TAC_OR,
     TAC_NOT,
     TAC_VECREAD,
+    TAC_CALL,
+    TAC_ARG,
     TAC_MOVE,
     TAC_VECMOVE,
     TAC_RET,
@@ -30,6 +32,8 @@ enum TacType {
     TAC_IFZ,
     TAC_LABEL,
     TAC_JUMP,
+    TAC_BEGINFUN,
+    TAC_ENDFUN,
 };
 
 typedef struct TacNode {

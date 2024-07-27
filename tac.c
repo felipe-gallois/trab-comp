@@ -22,6 +22,8 @@ static char *tac_strings[] = {
     "TAC_OR",
     "TAC_NOT",
     "TAC_VECREAD",
+    "TAC_CALL",
+    "TAC_ARG",
     "TAC_MOVE",
     "TAC_VECMOVE",
     "TAC_RET",
@@ -30,11 +32,15 @@ static char *tac_strings[] = {
     "TAC_IFZ",
     "TAC_LABEL",
     "TAC_JUMP",
+    "TAC_BEGINFUN",
+    "TAC_ENDFUN",
 };
 
 TacNode *generate_binary_op(enum TacType type, TacNode *children_code[]);
 TacNode *generate_unary_op(enum TacType type, TacNode *children_code[]);
 TacNode *generate_vec_exp(TacNode *children_code[]);
+TacNode *generate_func_exp(TacNode *children_code[]);
+TacNode *generate_arg(TacNode *children_code[]);
 TacNode *generate_move(TacNode *children_code[]);
 TacNode *generate_vec_attrib(TacNode *children_code[]);
 TacNode *generate_return(TacNode *children_code[]);
@@ -44,6 +50,7 @@ TacNode *generate_read(TacNode *children_code[]);
 TacNode *generate_if(TacNode *children_code[]);
 TacNode *generate_if_else(TacNode *children_code[]);
 TacNode *generate_while(TacNode *children_code[]);
+TacNode *generate_func_decl(TacNode *children_code[]);
 TacNode *generate_default(TacNode *children_code[]);
 
 TacNode *tac_create(enum TacType type, HashEntry *res, HashEntry *op1,
@@ -103,10 +110,16 @@ TacNode *generate_code(AstNode *node) {
         case AST_NOT:
             result = generate_unary_op(TAC_NOT, children_code);
             break;
-        // TODO: AST_VEC_EXP .. AST_CMD_LIST
         case AST_VEC_EXP:
             result = generate_vec_exp(children_code);
             break;
+        case AST_FUNC_EXP:
+            result = generate_func_exp(children_code);
+            break;
+        case AST_ARGS_LIST:
+            result = node->children[0] ? generate_arg(children_code) : NULL;
+            break;
+        // TODO: AST_LIT_LIST
         case AST_VAR_ATTRIB:
             result = generate_move(children_code);
             break;
@@ -134,7 +147,11 @@ TacNode *generate_code(AstNode *node) {
         case AST_WHILE:
             result = generate_while(children_code);
             break;
-        // TODO: AST_PARAM_LIST .. AST_VAR_DECL
+        // TODO: AST_PARAM, AST_PARAM_LIST
+        case AST_FUNC_DECL:
+            result = generate_func_decl(children_code);
+            break;
+        // TODO: AST_VEC_DECL .. AST_VAR_DECL
         default:
             result = generate_default(children_code);
             break;
@@ -174,6 +191,28 @@ TacNode *generate_vec_exp(TacNode *children_code[]) {
     );
 
     return tac_join(children_code[1], result);
+}
+
+TacNode *generate_func_exp(TacNode *children_code[]) {
+    TacNode *result = tac_create(
+            TAC_CALL,
+            children_code[0] ? children_code[0]->res : NULL,
+            NULL,
+            NULL
+    );
+
+    return tac_join(children_code[1], result);
+}
+
+TacNode *generate_arg(TacNode *children_code[]) {
+    TacNode *result = tac_create(
+            TAC_ARG,
+            children_code[0] ? children_code[0]->res : NULL,
+            NULL,
+            NULL
+    );
+
+    return tac_join(children_code[0], result);
 }
 
 TacNode *generate_move(TacNode *children_code[]) {
@@ -363,6 +402,30 @@ TacNode *generate_while(TacNode *children_code[]) {
                         )
                     )
                 )
+            )
+    );
+}
+
+TacNode *generate_func_decl(TacNode *children_code[]) {
+    TacNode *begin = tac_create(
+            TAC_BEGINFUN,
+            children_code[1] ? children_code[1]->res : NULL,
+            NULL,
+            NULL
+    );
+
+    TacNode *end = tac_create(
+            TAC_ENDFUN,
+            children_code[1] ? children_code[1]->res : NULL,
+            NULL,
+            NULL
+    );
+
+    return tac_join(
+            begin,
+            tac_join(
+                children_code[3],
+                end
             )
     );
 }
