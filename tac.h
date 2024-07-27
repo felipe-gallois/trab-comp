@@ -23,6 +23,7 @@ enum TacType {
     TAC_NOT,
     TAC_VECREAD,
     TAC_MOVE,
+    TAC_VECMOVE,
     TAC_RET,
     TAC_PRINT,
     TAC_READ,

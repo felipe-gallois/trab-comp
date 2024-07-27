@@ -23,6 +23,7 @@ static char *tac_strings[] = {
     "TAC_NOT",
     "TAC_VECREAD",
     "TAC_MOVE",
+    "TAC_VECMOVE",
     "TAC_RET",
     "TAC_PRINT",
     "TAC_READ",
@@ -35,6 +36,7 @@ TacNode *generate_binary_op(enum TacType type, TacNode *children_code[]);
 TacNode *generate_unary_op(enum TacType type, TacNode *children_code[]);
 TacNode *generate_vec_exp(TacNode *children_code[]);
 TacNode *generate_move(TacNode *children_code[]);
+TacNode *generate_vec_attrib(TacNode *children_code[]);
 TacNode *generate_return(TacNode *children_code[]);
 TacNode *generate_print_string(TacNode *children_code[]);
 TacNode *generate_print_lit(TacNode *children_code[]);
@@ -108,7 +110,9 @@ TacNode *generate_code(AstNode *node) {
         case AST_VAR_ATTRIB:
             result = generate_move(children_code);
             break;
-        // TODO: AST_VEC_ATTRIB
+        case AST_VEC_ATTRIB:
+            result = generate_vec_attrib(children_code);
+            break;
         case AST_RET:
             result = generate_return(children_code);
             break;
@@ -181,6 +185,23 @@ TacNode *generate_move(TacNode *children_code[]) {
     );
 
     return tac_join(children_code[0], tac_join(children_code[1], result));
+}
+
+TacNode *generate_vec_attrib(TacNode *children_code[]) {
+    TacNode *result = tac_create(
+            TAC_VECMOVE,
+            children_code[0] ? children_code[0]->res : NULL,
+            children_code[1] ? children_code[1]->res : NULL,
+            children_code[2] ? children_code[2]->res : NULL
+    );
+
+    return tac_join(
+            children_code[1],
+            tac_join(
+                children_code[2],
+                result
+            )
+    );
 }
 
 TacNode *generate_return(TacNode *children_code[]) {
