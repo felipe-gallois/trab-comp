@@ -34,7 +34,6 @@ static char *tac_strings[] = {
     "TAC_JUMP",
     "TAC_BEGINFUN",
     "TAC_ENDFUN",
-    "TAC_VAR",
 };
 
 TacNode *generate_binary_op(enum TacType type, TacNode *children_code[]);
@@ -52,7 +51,6 @@ TacNode *generate_if(TacNode *children_code[]);
 TacNode *generate_if_else(TacNode *children_code[]);
 TacNode *generate_while(TacNode *children_code[]);
 TacNode *generate_func_decl(TacNode *children_code[]);
-TacNode *generate_var_decl(TacNode *children_code[]);
 TacNode *generate_default(TacNode *children_code[]);
 
 TacNode *tac_create(enum TacType type, HashEntry *res, HashEntry *op1,
@@ -149,13 +147,11 @@ TacNode *generate_code(AstNode *node) {
         case AST_WHILE:
             result = generate_while(children_code);
             break;
+        // TODO: AST_PARAM, AST_PARAM_LIST
         case AST_FUNC_DECL:
             result = generate_func_decl(children_code);
             break;
-        // TODO: AST_VEC_DECL, AST_VEC_DECL_DEF
-        case AST_VAR_DECL:
-            result = generate_var_decl(children_code);
-            break;
+        // TODO: AST_VEC_DECL .. AST_VAR_DECL
         default:
             result = generate_default(children_code);
             break;
@@ -436,23 +432,6 @@ TacNode *generate_func_decl(TacNode *children_code[]) {
             tac_join(
                 children_code[3],
                 end
-            )
-    );
-}
-
-TacNode *generate_var_decl(TacNode *children_code[]) {
-    TacNode *result = tac_create(
-            TAC_VAR,
-            children_code[1] ? children_code[1]->res : NULL,
-            children_code[2] ? children_code[2]->res : NULL,
-            NULL
-    );
-
-    return tac_join(
-            children_code[1],
-            tac_join(
-                children_code[2],
-                result
             )
     );
 }
