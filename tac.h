@@ -34,6 +34,7 @@ enum TacType {
     TAC_JUMP,
     TAC_BEGINFUN,
     TAC_ENDFUN,
+    TAC_VAR,
 };
 
 typedef struct TacNode {
