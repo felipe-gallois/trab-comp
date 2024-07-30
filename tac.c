@@ -196,8 +196,8 @@ TacNode *generate_vec_exp(TacNode *children_code[]) {
 TacNode *generate_func_exp(TacNode *children_code[]) {
     TacNode *result = tac_create(
             TAC_CALL,
+            makeTemp(),
             children_code[0] ? children_code[0]->res : NULL,
-            NULL,
             NULL
     );
 
