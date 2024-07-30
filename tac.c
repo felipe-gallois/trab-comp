@@ -395,9 +395,9 @@ TacNode *generate_while(TacNode *children_code[]) {
     );
 
     return tac_join(
-            children_code[0],
+            test_label,
             tac_join(
-                test_label,
+                children_code[0],
                 tac_join(
                     test,
                     tac_join(
