@@ -212,7 +212,13 @@ TacNode *generate_arg(TacNode *children_code[]) {
             NULL
     );
 
-    return tac_join(children_code[0], result);
+    return tac_join(
+            children_code[0],
+            tac_join(
+                result,
+                children_code[1]
+            )
+    );
 }
 
 TacNode *generate_move(TacNode *children_code[]) {
