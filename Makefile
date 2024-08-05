@@ -14,7 +14,7 @@ OBJS = $(SRC:.c=.o)
 
 AUX1 = $(SRC1:.c=.h)
 
-BIN = etapa5
+BIN = etapa6
 
 $(BIN): $(OBJS)
 	$(CC) -o $(BIN) $(OBJS)

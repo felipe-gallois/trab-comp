@@ -13,6 +13,7 @@ extern int semantic_errors;
 extern FILE *yyin;
 
 AstNode *ast_root;
+TacNode *tac_list;
 
 void yyparse();
 void initMe();
@@ -31,17 +32,19 @@ int main(int argc, char** argv) {
     initMe();
     yyparse();
     ast_print(ast_root, 0);
+    decompile(ast_root, argv[2]);
     check_and_set_declarations(ast_root);
     check_nodes(ast_root);
-    decompile(ast_root, argv[2]);
-    tac_print(tac_reverse_list(generate_code(ast_root)));
-    print_hash();
 
     // Debug
     fprintf(stderr, "Semantic errors: %d\n", semantic_errors);
 
     if (semantic_errors > 0)
         exit(4);
+
+    tac_list = tac_reverse_list(generate_code(ast_root)); 
+    tac_print(tac_list);
+    print_hash();
 
     exit(0);
 }
