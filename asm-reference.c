@@ -16,3 +16,7 @@ int main() {
     printf("%f", x);
     printf("%c", y);
 }
+
+long a() { return 0; }
+float b() { return 0.0f; }
+char c() { return '\0'; }

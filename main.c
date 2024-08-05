@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     tac_print(tac_list);
     enumerate_literals();
     print_hash();
-    generateAsm("assembly.s");
+    generateAsm("assembly.s", tac_list);
 
     exit(0);
 }

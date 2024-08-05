@@ -12,6 +12,7 @@ y.tab.*
 
 # Executables
 etapa*
+*.out
 
 # Output file
 output.txt
