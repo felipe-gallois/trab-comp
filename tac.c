@@ -27,7 +27,11 @@ static char *tac_strings[] = {
     "TAC_MOVE",
     "TAC_VECMOVE",
     "TAC_RET",
-    "TAC_PRINT",
+    "TAC_PRINTINT",
+    "TAC_PRINTFLOAT",
+    "TAC_PRINTBOOL",
+    "TAC_PRINTCHAR",
+    "TAC_PRINTSTRING",
     "TAC_READ",
     "TAC_IFZ",
     "TAC_LABEL",
@@ -45,7 +49,7 @@ TacNode *generate_move(TacNode *children_code[]);
 TacNode *generate_vec_attrib(TacNode *children_code[]);
 TacNode *generate_return(TacNode *children_code[]);
 TacNode *generate_print_string(TacNode *children_code[]);
-TacNode *generate_print_lit(TacNode *children_code[]);
+TacNode *generate_print_lit(enum TacType tac_type, TacNode *children_code[]);
 TacNode *generate_read(TacNode *children_code[]);
 TacNode *generate_if(TacNode *children_code[]);
 TacNode *generate_if_else(TacNode *children_code[]);
@@ -133,7 +137,22 @@ TacNode *generate_code(AstNode *node) {
             result = generate_print_string(children_code);
             break;
         case AST_PRINT_LIT:
-            result = generate_print_lit(children_code);
+            switch (node->children[0]->type) {
+                case AST_INT:
+                    result = generate_print_lit(TAC_PRINTINT, children_code);
+                    break;
+                case AST_FLOAT:
+                    result = generate_print_lit(TAC_PRINTFLOAT, children_code);
+                    break;
+                case AST_BOOL:
+                    result = generate_print_lit(TAC_PRINTBOOL, children_code);
+                    break;
+                case AST_CHAR:
+                    result = generate_print_lit(TAC_PRINTCHAR, children_code);
+                    break;
+                default:
+                    break;
+            }
             break;
         case AST_READ:
             result = generate_read(children_code);
@@ -262,7 +281,7 @@ TacNode *generate_return(TacNode *children_code[]) {
 
 TacNode *generate_print_string(TacNode *children_code[]) {
     TacNode *result = tac_create(
-            TAC_PRINT,
+            TAC_PRINTSTRING,
             NULL,
             children_code[0] ? children_code[0]->res : NULL,
             NULL
@@ -271,9 +290,9 @@ TacNode *generate_print_string(TacNode *children_code[]) {
     return tac_join(children_code[0], result);
 }
 
-TacNode *generate_print_lit(TacNode *children_code[]) {
+TacNode *generate_print_lit(enum TacType tac_type, TacNode *children_code[]) {
     TacNode *result = tac_create(
-            TAC_PRINT,
+            tac_type,
             NULL,
             children_code[1] ? children_code[1]->res : NULL,
             NULL
@@ -499,7 +518,7 @@ void tac_print(TacNode *list) {
 
     while (list != NULL) {
         // Não imprime TAC_SYMBOL
-        if (list->type != TAC_SYMBOL) {
+        if (1) {
             res = list->res;
             op1 = list->op1;
             op2 = list->op2;

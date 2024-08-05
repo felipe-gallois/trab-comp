@@ -6,10 +6,13 @@ char y = 'i';
 
 int main() {
     // Impressão de literais
-    printf("%ld", 1l);
-    printf("%f", 2.0f);
+    printf("%ld", 1l + 2l);
+    printf("%f", 2.0f + 3.0f);
     printf("%c", 'c');
     printf("def");
+
+    // Soma
+    w += 2l;
 
     // Impressão de variáveis
     printf("%ld", w);
