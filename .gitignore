@@ -7,6 +7,9 @@ y.tab.*
 # Compilation objects
 *.o
 
+# Assembly files
+*.s
+
 # Executables
 etapa*
 

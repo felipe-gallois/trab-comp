@@ -3,6 +3,8 @@
 #ifndef HASH_H
 #define HASH_H
 
+#include <stdio.h>
+
 #define HASH_SIZE 997
 
 enum SymbolType {
@@ -39,6 +41,7 @@ typedef struct HashEntry {
     enum DataType datatype;
     unsigned long capacity;
     TypeList *parameters;
+    char id[16];
     char *string;
     struct HashEntry *next;
 } HashEntry;
@@ -49,6 +52,8 @@ HashEntry *find_entry(char *string);
 HashEntry *insert_entry(char *string, enum SymbolType type);
 HashEntry *makeTemp();
 HashEntry *makeLabel();
+void enumerate_literals();
+void write_literals(FILE *asm_file);
 void print_hash();
 
 #endif

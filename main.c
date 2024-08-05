@@ -8,6 +8,7 @@
 #include "semantic.h"
 #include "decompilation.h"
 #include "tac.h"
+#include "asm.h"
 
 extern int semantic_errors;
 extern FILE *yyin;
@@ -44,7 +45,9 @@ int main(int argc, char** argv) {
 
     tac_list = tac_reverse_list(generate_code(ast_root)); 
     tac_print(tac_list);
+    enumerate_literals();
     print_hash();
+    generateAsm("assembly.s");
 
     exit(0);
 }
