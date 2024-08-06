@@ -28,9 +28,9 @@ ESCAPE_SEQ "\\n"|"\\\""
 "print"     { return KW_PRINT; }
 "return"     { return KW_RETURN; }
 
-"false"     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_FALSE);
+"false"     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_FALSE, DATATYPE_BOOL);
               return LIT_FALSE; }
-"true"      { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_TRUE);
+"true"      { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_TRUE, DATATYPE_BOOL);
               return LIT_TRUE; }
 
 "//"        { BEGIN(SINGLE_COMMENT); }
@@ -49,23 +49,23 @@ ESCAPE_SEQ "\\n"|"\\\""
 "=="        { return OPERATOR_EQ; }
 "!="        { return OPERATOR_DIF; }
 
-[0-9]+      { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_INT);
+[0-9]+      { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_INT, DATATYPE_INT);
               return LIT_INT; }
 
-[0-9]+"."[0-9]+     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_REAL);
+[0-9]+"."[0-9]+     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_REAL, DATATYPE_REAL);
                       return LIT_REAL; }
-[0-9]+"."       { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_REAL);
+[0-9]+"."       { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_REAL, DATATYPE_REAL);
                   return LIT_REAL; }
-"."[0-9]+     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_REAL);
+"."[0-9]+     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_REAL, DATATYPE_REAL);
                 return LIT_REAL; }
 
-"\'"(.|{ESCAPE_SEQ})"\'"       { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_CHAR);
+"\'"(.|{ESCAPE_SEQ})"\'"       { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_CHAR, DATATYPE_CHAR);
                                  return LIT_CHAR; } 
 
-"\""([^\n"]|{ESCAPE_SEQ})*"\""     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_STRING);
+"\""([^\n"]|{ESCAPE_SEQ})*"\""     { yylval.hash_entry = insert_entry(yytext, SYMBOL_LIT_STRING, DATATYPE_STRING);
                                      return LIT_STRING; }
 
-[a-zA-Z\_][0-9a-zA-Z\_]*      { yylval.hash_entry = insert_entry(yytext, SYMBOL_TK_IDENTIFIER);
+[a-zA-Z\_][0-9a-zA-Z\_]*      { yylval.hash_entry = insert_entry(yytext, SYMBOL_TK_IDENTIFIER, DATATYPE_UNKNOWN);
                                 return TK_IDENTIFIER; } 
 
 [ \t]

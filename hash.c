@@ -31,7 +31,7 @@ HashEntry *find_entry(char *string) {
     return NULL;    // no matches
 }
 
-HashEntry *insert_entry(char *string, enum SymbolType type) {
+HashEntry *insert_entry(char *string, enum SymbolType type, enum DataType datatype) {
     int address = get_address(string);
 
     HashEntry *new_entry;
@@ -40,7 +40,7 @@ HashEntry *insert_entry(char *string, enum SymbolType type) {
 
     new_entry = (HashEntry*) malloc(sizeof(HashEntry));
     new_entry->type = type;
-    new_entry->datatype = DATATYPE_UNKNOWN;
+    new_entry->datatype = datatype;
     new_entry->capacity = 0;
     new_entry->parameters = NULL;
     new_entry->string = (char*) malloc((strlen(string) + 1)
@@ -51,7 +51,7 @@ HashEntry *insert_entry(char *string, enum SymbolType type) {
     return new_entry;
 }
 
-HashEntry *makeTemp() {
+HashEntry *makeTemp(enum DataType datatype) {
     static int serial = 0;
 
     HashEntry *result;
@@ -59,7 +59,7 @@ HashEntry *makeTemp() {
 
     sprintf(buffer, "_temp%d", serial);
 
-    result = insert_entry(buffer, SYMBOL_TEMP);
+    result = insert_entry(buffer, SYMBOL_TEMP, datatype);
     serial++;
 
     return result;
@@ -73,7 +73,7 @@ HashEntry *makeLabel() {
 
     sprintf(buffer, "_label%d", serial);
 
-    result = insert_entry(buffer, SYMBOL_LABEL);
+    result = insert_entry(buffer, SYMBOL_LABEL, DATATYPE_UNKNOWN);
     serial++;
 
     return result;

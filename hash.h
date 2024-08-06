@@ -49,8 +49,8 @@ typedef struct HashEntry {
 void hash_init();
 int get_address(char *string);
 HashEntry *find_entry(char *string);
-HashEntry *insert_entry(char *string, enum SymbolType type);
-HashEntry *makeTemp();
+HashEntry *insert_entry(char *string, enum SymbolType type, enum DataType datatype);
+HashEntry *makeTemp(enum DataType datatype);
 HashEntry *makeLabel();
 void enumerate_literals();
 void write_literals(FILE *asm_file);

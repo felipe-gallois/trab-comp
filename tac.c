@@ -40,10 +40,10 @@ static char *tac_strings[] = {
     "TAC_ENDFUN",
 };
 
-TacNode *generate_binary_op(enum TacType type, TacNode *children_code[]);
-TacNode *generate_unary_op(enum TacType type, TacNode *children_code[]);
-TacNode *generate_vec_exp(TacNode *children_code[]);
-TacNode *generate_func_exp(TacNode *children_code[]);
+TacNode *generate_binary_op(enum TacType type, enum DataType datatype, TacNode *children_code[]);
+TacNode *generate_unary_op(enum TacType type, enum DataType datatype, TacNode *children_code[]);
+TacNode *generate_vec_exp(enum DataType datatype, TacNode *children_code[]);
+TacNode *generate_func_exp(enum DataType datatype, TacNode *children_code[]);
 TacNode *generate_arg(TacNode *children_code[]);
 TacNode *generate_move(TacNode *children_code[]);
 TacNode *generate_vec_attrib(TacNode *children_code[]);
@@ -56,6 +56,8 @@ TacNode *generate_if_else(TacNode *children_code[]);
 TacNode *generate_while(TacNode *children_code[]);
 TacNode *generate_func_decl(TacNode *children_code[]);
 TacNode *generate_default(TacNode *children_code[]);
+
+enum DataType normalize_datatype(enum DataType datatype);
 
 TacNode *tac_create(enum TacType type, HashEntry *res, HashEntry *op1,
                     HashEntry *op2);
@@ -76,49 +78,49 @@ TacNode *generate_code(AstNode *node) {
             result = tac_create(TAC_SYMBOL, node->symbol, NULL, NULL);
             break;
         case AST_SUM:
-            result = generate_binary_op(TAC_ADD, children_code);
+            result = generate_binary_op(TAC_ADD, normalize_datatype(children_code[0]->res->datatype), children_code);
             break;
         case AST_SUB:
-            result = generate_binary_op(TAC_SUB, children_code);
+            result = generate_binary_op(TAC_SUB, normalize_datatype(children_code[0]->res->datatype), children_code);
             break;
         case AST_MUL:
-            result = generate_binary_op(TAC_MUL, children_code);
+            result = generate_binary_op(TAC_MUL, normalize_datatype(children_code[0]->res->datatype), children_code);
             break;
         case AST_DIV:
-            result = generate_binary_op(TAC_DIV, children_code);
+            result = generate_binary_op(TAC_DIV, normalize_datatype(children_code[0]->res->datatype), children_code);
             break;
         case AST_LESS:
-            result = generate_binary_op(TAC_LESS, children_code);
+            result = generate_binary_op(TAC_LESS, DATATYPE_BOOL, children_code);
             break;
         case AST_GREATER:
-            result = generate_binary_op(TAC_GREATER, children_code);
+            result = generate_binary_op(TAC_GREATER, DATATYPE_BOOL, children_code);
             break;
         case AST_LE:
-            result = generate_binary_op(TAC_LE, children_code);
+            result = generate_binary_op(TAC_LE, DATATYPE_BOOL, children_code);
             break;
         case AST_GE:
-            result = generate_binary_op(TAC_GE, children_code);
+            result = generate_binary_op(TAC_GE, DATATYPE_BOOL, children_code);
             break;
         case AST_EQ:
-            result = generate_binary_op(TAC_EQ, children_code);
+            result = generate_binary_op(TAC_EQ, DATATYPE_BOOL, children_code);
             break;
         case AST_DIF:
-            result = generate_binary_op(TAC_DIF, children_code);
+            result = generate_binary_op(TAC_DIF, DATATYPE_BOOL, children_code);
             break;
         case AST_AND:
-            result = generate_binary_op(TAC_AND, children_code);
+            result = generate_binary_op(TAC_AND, DATATYPE_BOOL, children_code);
             break;
         case AST_OR:
-            result = generate_binary_op(TAC_OR, children_code);
+            result = generate_binary_op(TAC_OR, DATATYPE_BOOL, children_code);
             break;
         case AST_NOT:
-            result = generate_unary_op(TAC_NOT, children_code);
+            result = generate_unary_op(TAC_NOT, DATATYPE_BOOL, children_code);
             break;
         case AST_VEC_EXP:
-            result = generate_vec_exp(children_code);
+            result = generate_vec_exp(children_code[0]->res->datatype, children_code);
             break;
         case AST_FUNC_EXP:
-            result = generate_func_exp(children_code);
+            result = generate_func_exp(children_code[0]->res->datatype, children_code);
             break;
         case AST_ARGS_LIST:
             result = node->children[0] ? generate_arg(children_code) : NULL;
@@ -179,10 +181,10 @@ TacNode *generate_code(AstNode *node) {
     return result;
 }
 
-TacNode *generate_binary_op(enum TacType type, TacNode *children_code[]) {
+TacNode *generate_binary_op(enum TacType type, enum DataType datatype, TacNode *children_code[]) {
     TacNode *result = tac_create(
             type,
-            makeTemp(),
+            makeTemp(datatype),
             children_code[0] ? children_code[0]->res : NULL,
             children_code[1] ? children_code[1]->res : NULL
     );
@@ -190,10 +192,10 @@ TacNode *generate_binary_op(enum TacType type, TacNode *children_code[]) {
     return tac_join(children_code[0], tac_join(children_code[1], result));
 }
 
-TacNode *generate_unary_op(enum TacType type, TacNode *children_code[]) {
+TacNode *generate_unary_op(enum TacType type, enum DataType datatype, TacNode *children_code[]) {
     TacNode *result = tac_create(
             type,
-            makeTemp(),
+            makeTemp(datatype),
             children_code[0] ? children_code[0]->res : NULL,
             NULL
     );
@@ -201,10 +203,10 @@ TacNode *generate_unary_op(enum TacType type, TacNode *children_code[]) {
     return tac_join(children_code[0], result);
 }
 
-TacNode *generate_vec_exp(TacNode *children_code[]) {
+TacNode *generate_vec_exp(enum DataType datatype, TacNode *children_code[]) {
     TacNode *result = tac_create(
             TAC_VECREAD,
-            makeTemp(),
+            makeTemp(datatype),
             children_code[0] ? children_code[0]->res : NULL,
             children_code[1] ? children_code[1]->res : NULL
     );
@@ -212,10 +214,10 @@ TacNode *generate_vec_exp(TacNode *children_code[]) {
     return tac_join(children_code[1], result);
 }
 
-TacNode *generate_func_exp(TacNode *children_code[]) {
+TacNode *generate_func_exp(enum DataType datatype, TacNode *children_code[]) {
     TacNode *result = tac_create(
             TAC_CALL,
-            makeTemp(),
+            makeTemp(datatype),
             children_code[0] ? children_code[0]->res : NULL,
             NULL
     );
@@ -518,7 +520,7 @@ void tac_print(TacNode *list) {
 
     while (list != NULL) {
         // Não imprime TAC_SYMBOL
-        if (1) {
+        if (list->type != TAC_SYMBOL) {
             res = list->res;
             op1 = list->op1;
             op2 = list->op2;
@@ -533,3 +535,9 @@ void tac_print(TacNode *list) {
     }
 }
 
+enum DataType normalize_datatype(enum DataType datatype) {
+    if (datatype == DATATYPE_CHAR)
+        return DATATYPE_INT;
+
+    return datatype;
+}
