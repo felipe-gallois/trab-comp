@@ -4,9 +4,9 @@
 #include "asm.h"
 
 void write_print_formats(FILE *asm_file) {
-    fprintf(asm_file, "printint:\n"
+    fprintf(asm_file, "_printint:\n"
             "\t.string\t\"%%ld\"\n"
-            "printfloat:\n"
+            "_printfloat:\n"
             "\t.string\t\"%%f\"\n");
 }
 
@@ -28,11 +28,12 @@ void write_bss_section(FILE *asm_file, AstNode *ast_tree) {
     fprintf(asm_file, "## UNINITIALIZED DATA\n"
             ".bss\n");
     write_vec_decl(asm_file, ast_tree);
+    write_temps(asm_file);
 }
 
 void write_printint(FILE *asm_file) {
     fprintf(asm_file, "\tmovq\t%%rax, %%rsi\n"
-            "\tleaq\tprintint(%%rip), %%rax\n"
+            "\tleaq\t_printint(%%rip), %%rax\n"
             "\tmovq\t%%rax, %%rdi\n"
             "\tmovl\t$0, %%eax\n"
             "\tcall\tprintf@PLT\n"
@@ -41,7 +42,7 @@ void write_printint(FILE *asm_file) {
 
 void write_printfloat(FILE *asm_file) {
     fprintf(asm_file, "\tmovq\t%%rax, %%xmm0\n"
-            "\tleaq\tprintfloat(%%rip), %%rax\n"
+            "\tleaq\t_printfloat(%%rip), %%rax\n"
             "\tmovq\t%%rax, %%rdi\n"
             "\tmovl\t$1, %%eax\n"
             "\tcall\tprintf@PLT\n"

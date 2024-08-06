@@ -122,25 +122,54 @@ void write_literals(FILE *asm_file) {
         for (HashEntry *entry = table[i]; entry; entry = entry->next) {
             switch (entry->type) {
                 case SYMBOL_LIT_INT:
-                    fprintf(asm_file, "%s:\n\t.long\t%s\n", entry->id, entry->string); 
+                    fprintf(asm_file, "_%s:\n\t.long\t%s\n", entry->id, entry->string); 
                     break;
                 case SYMBOL_LIT_REAL:
-                    fprintf(asm_file, "%s:\n\t.float\t%s\n", entry->id, entry->string); 
+                    fprintf(asm_file, "_%s:\n\t.float\t%s\n", entry->id, entry->string); 
                     break;
                 case SYMBOL_LIT_FALSE:
-                    fprintf(asm_file, "%s:\n\t.long\t0\n", entry->id); 
+                    fprintf(asm_file, "_%s:\n\t.long\t0\n", entry->id); 
                     break;
                 case SYMBOL_LIT_TRUE:
-                    fprintf(asm_file, "%s:\n\t.long\t1\n", entry->id); 
+                    fprintf(asm_file, "_%s:\n\t.long\t1\n", entry->id); 
                     break;
                 case SYMBOL_LIT_CHAR:
-                    fprintf(asm_file, "%s:\n\t.byte\t%s\n", entry->id, entry->string); 
+                    fprintf(asm_file, "_%s:\n\t.byte\t%s\n", entry->id, entry->string); 
                     break;
                 case SYMBOL_LIT_STRING:
-                    fprintf(asm_file, "%s:\n\t.string\t%s\n", entry->id, entry->string); 
+                    fprintf(asm_file, "_%s:\n\t.string\t%s\n", entry->id, entry->string); 
                     break;
                 default:
                     break;
+            }
+        }
+    }
+}
+
+void write_temps(FILE *asm_file) {
+    int size;
+
+    for (int i = 0; i < HASH_SIZE; i++) {
+        for (HashEntry *entry = table[i]; entry; entry = entry->next) {
+            if (entry->type == SYMBOL_TEMP) {
+                switch (entry->datatype) {
+                    case DATATYPE_INT:
+                    case DATATYPE_REAL:
+                    case DATATYPE_BOOL:
+                        size = 4;
+                        break;
+                    case DATATYPE_CHAR:
+                        size = 1;
+                        break;
+                    default:
+                        size = 0;
+                        break;
+                }
+
+                fprintf(asm_file,
+                        ".comm\t_%s, %d\n",
+                        entry->string,
+                        size);
             }
         }
     }
