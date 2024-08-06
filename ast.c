@@ -179,7 +179,7 @@ void ast_print(AstNode *node, int level) {
         ast_print(node->children[i], level + 1);
 }
 
-void write_variables(FILE *asm_file, AstNode *tree) {
+void write_var_decl(FILE *asm_file, AstNode *tree) {
     AstNode *declaration;
 
     while (tree != NULL) {
@@ -213,3 +213,89 @@ void write_variables(FILE *asm_file, AstNode *tree) {
     }
 }
 
+void write_vec_decl(FILE *asm_file, AstNode *tree) {
+    AstNode *declaration;
+
+    while (tree != NULL) {
+        declaration = tree->children[0];
+
+        if (declaration->type == AST_VEC_DECL) {
+            switch (declaration->children[1]->symbol->datatype) {
+                case DATATYPE_INT:
+                case DATATYPE_REAL:
+                case DATATYPE_BOOL:
+                    fprintf(asm_file,
+                            ".comm\t_%s, %d\n",
+                            declaration->children[1]->symbol->string,
+                            4 * atoi(declaration->children[2]->symbol->string));
+                    break;
+                case DATATYPE_CHAR:
+                    fprintf(asm_file,
+                            ".comm\t_%s, %d\n",
+                            declaration->children[1]->symbol->string,
+                            atoi(declaration->children[2]->symbol->string));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        tree = tree->children[1];
+    }
+}
+
+void write_literal(FILE *asm_file, AstNode *literal) {
+    if (literal->symbol->type == SYMBOL_LIT_TRUE) {
+        fprintf(asm_file, "1");
+    } else if (literal->symbol->type == SYMBOL_LIT_FALSE) {
+        fprintf(asm_file, "0");
+    } else {
+        fprintf(asm_file, "%s", literal->symbol->string);
+    }
+}
+
+void write_literal_list(FILE *asm_file, AstNode *lit_list) {
+    fprintf(asm_file, "%s", lit_list->children[0]->symbol->string); 
+
+    for (; lit_list->children[1] != NULL; lit_list = lit_list->children[1]) {
+        fprintf(asm_file, ", ");
+        write_literal(asm_file, lit_list->children[0]); 
+    }
+
+    fprintf(asm_file, "\n");
+}
+
+void write_vec_decl_def(FILE *asm_file, AstNode *tree) {
+    AstNode *declaration;
+
+    while (tree != NULL) {
+        declaration = tree->children[0];
+
+        if (declaration->type == AST_VEC_DECL_DEF) {
+            fprintf(asm_file, "_%s:\n", declaration->children[1]->symbol->string);
+            switch (declaration->children[1]->symbol->datatype) {
+                case DATATYPE_INT:
+                    fprintf(asm_file, "\t.long\t");
+                    break;
+                case DATATYPE_REAL:
+                    fprintf(asm_file, "\t.float\t");
+                    break;
+                case DATATYPE_BOOL:
+                    if (declaration->children[2]->symbol->type == SYMBOL_LIT_FALSE) {
+                        fprintf(asm_file, "\t.long\t");
+                    } else {
+                        fprintf(asm_file, "\t.long\t");
+                    }
+                    break;
+                case DATATYPE_CHAR:
+                    fprintf(asm_file, "\t.byte\t");
+                    break;
+                default:
+                    break;
+            }
+            write_literal_list(asm_file, declaration->children[3]);
+        }
+
+        tree = tree->children[1];
+    }
+}

@@ -66,6 +66,10 @@ void ast_print_node(AstNode *node, int level);
 
 void ast_print(AstNode *node, int level);
 
-void write_variables(FILE *asm_file, AstNode *tree);
+void write_var_decl(FILE *asm_file, AstNode *tree);
+
+void write_vec_decl(FILE *asm_file, AstNode *tree);
+
+void write_vec_decl_def(FILE *asm_file, AstNode *tree);
 
 #endif

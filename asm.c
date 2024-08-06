@@ -20,7 +20,14 @@ void write_read_only(FILE *asm_file) {
 void write_data_section(FILE *asm_file, AstNode *ast_tree) {
     fprintf(asm_file, "## VARIABLE DATA\n"
             ".section\t.data\n");
-    write_variables(asm_file, ast_tree);
+    write_var_decl(asm_file, ast_tree);
+    write_vec_decl_def(asm_file, ast_tree);
+}
+
+void write_bss_section(FILE *asm_file, AstNode *ast_tree) {
+    fprintf(asm_file, "## UNINITIALIZED DATA\n"
+            ".bss\n");
+    write_vec_decl(asm_file, ast_tree);
 }
 
 void write_printint(FILE *asm_file) {
@@ -103,6 +110,8 @@ void generateAsm(const char *file_name, AstNode *ast_tree, TacNode *tac_list) {
     write_read_only(file);
     fprintf(file, "\n");
     write_data_section(file, ast_tree);
+    fprintf(file, "\n");
+    write_bss_section(file, ast_tree);
     fprintf(file, "\n");
     write_instructions(file, tac_list);
     fclose(file);
