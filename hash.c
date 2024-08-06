@@ -89,29 +89,28 @@ void enumerate_literals() {
         for (HashEntry *entry = table[i]; entry; entry = entry->next) {
             switch (entry->type) {
                 case SYMBOL_LIT_INT:
-                    sprintf(entry->id, "_int%d", int_counter);
+                    sprintf(entry->id, "int%d", int_counter);
                     int_counter++;
                     break;
                 case SYMBOL_LIT_CHAR:
-                    sprintf(entry->id, "_char%d", char_counter);
+                    sprintf(entry->id, "char%d", char_counter);
                     char_counter++;
                     break;
                 case SYMBOL_LIT_REAL:
-                    sprintf(entry->id, "_float%d", float_counter);
+                    sprintf(entry->id, "float%d", float_counter);
                     float_counter++;
                     break;
                 case SYMBOL_LIT_FALSE:
-                    sprintf(entry->id, "_false");
+                    sprintf(entry->id, "false");
                     break;
                 case SYMBOL_LIT_TRUE:
-                    sprintf(entry->id, "_true");
+                    sprintf(entry->id, "true");
                     break;
                 case SYMBOL_LIT_STRING:
-                    sprintf(entry->id, "_string%d", string_counter);
+                    sprintf(entry->id, "string%d", string_counter);
                     string_counter++;
                     break;
                 default:
-                    sprintf(entry->id, "");
                     break;
             }
         }
@@ -123,7 +122,6 @@ void write_literals(FILE *asm_file) {
         for (HashEntry *entry = table[i]; entry; entry = entry->next) {
             switch (entry->type) {
                 case SYMBOL_LIT_INT:
-                case SYMBOL_LIT_CHAR:
                     fprintf(asm_file, "%s:\n\t.long\t%s\n", entry->id, entry->string); 
                     break;
                 case SYMBOL_LIT_REAL:
@@ -134,6 +132,9 @@ void write_literals(FILE *asm_file) {
                     break;
                 case SYMBOL_LIT_TRUE:
                     fprintf(asm_file, "%s:\n\t.long\t1\n", entry->id); 
+                    break;
+                case SYMBOL_LIT_CHAR:
+                    fprintf(asm_file, "%s:\n\t.byte\t%s\n", entry->id, entry->string); 
                     break;
                 case SYMBOL_LIT_STRING:
                     fprintf(asm_file, "%s:\n\t.string\t%s\n", entry->id, entry->string); 

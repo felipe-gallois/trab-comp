@@ -3,6 +3,6 @@
 
 #include "tac.h"
 
-void generateAsm(const char *file_name, TacNode *tac_list);
+void generateAsm(const char *file_name, AstNode *ast_tree, TacNode *tac_list);
 
 #endif

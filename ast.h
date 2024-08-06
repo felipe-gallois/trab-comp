@@ -66,4 +66,6 @@ void ast_print_node(AstNode *node, int level);
 
 void ast_print(AstNode *node, int level);
 
+void write_variables(FILE *asm_file, AstNode *tree);
+
 #endif

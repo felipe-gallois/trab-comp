@@ -17,6 +17,12 @@ void write_read_only(FILE *asm_file) {
     write_literals(asm_file);
 }
 
+void write_data_section(FILE *asm_file, AstNode *ast_tree) {
+    fprintf(asm_file, "## VARIABLE DATA\n"
+            ".section\t.data\n");
+    write_variables(asm_file, ast_tree);
+}
+
 void write_printint(FILE *asm_file) {
     fprintf(asm_file, "\tmovq\t%%rax, %%rsi\n"
             "\tleaq\tprintint(%%rip), %%rax\n"
@@ -92,9 +98,11 @@ void write_instructions(FILE *asm_file, TacNode *tac_list) {
     }
 }
 
-void generateAsm(const char *file_name, TacNode *tac_list) {
+void generateAsm(const char *file_name, AstNode *ast_tree, TacNode *tac_list) {
     FILE *file = fopen(file_name, "w");    
     write_read_only(file);
+    fprintf(file, "\n");
+    write_data_section(file, ast_tree);
     fprintf(file, "\n");
     write_instructions(file, tac_list);
     fclose(file);

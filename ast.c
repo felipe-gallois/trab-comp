@@ -178,3 +178,38 @@ void ast_print(AstNode *node, int level) {
     for (int i = 0; i < MAX_CHILDREN; i++)
         ast_print(node->children[i], level + 1);
 }
+
+void write_variables(FILE *asm_file, AstNode *tree) {
+    AstNode *declaration;
+
+    while (tree != NULL) {
+        declaration = tree->children[0];
+
+        if (declaration->type == AST_VAR_DECL) {
+            fprintf(asm_file, "_%s:\n", declaration->children[1]->symbol->string);
+            switch (declaration->children[1]->symbol->datatype) {
+                case DATATYPE_INT:
+                    fprintf(asm_file, "\t.long\t%s\n", declaration->children[2]->symbol->string);
+                    break;
+                case DATATYPE_REAL:
+                    fprintf(asm_file, "\t.float\t%s\n", declaration->children[2]->symbol->string);
+                    break;
+                case DATATYPE_BOOL:
+                    if (declaration->children[2]->symbol->type == SYMBOL_LIT_FALSE) {
+                        fprintf(asm_file, "\t.long\t0\n");
+                    } else {
+                        fprintf(asm_file, "\t.long\t1\n");
+                    }
+                    break;
+                case DATATYPE_CHAR:
+                    fprintf(asm_file, "\t.byte\t%s\n", declaration->children[2]->symbol->string);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        tree = tree->children[1];
+    }
+}
+
