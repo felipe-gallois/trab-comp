@@ -1,16 +1,14 @@
 int main () {
-    print bool 1 < 3;
+    print bool true & false;
     print "\n";
-    print bool 1 > 3;
+    print bool true & true;
     print "\n";
-    print bool 1 <= 3;
+    print bool true | false;
     print "\n";
-    print bool 1 >= 3;
+    print bool false | false;
     print "\n";
-    print bool 3 <= 3;
+    print bool ~false;
     print "\n";
-    print bool 3 == 3;
-    print "\n";
-    print bool 3 != 3;
+    print bool ~true;
     print "\n";
 }

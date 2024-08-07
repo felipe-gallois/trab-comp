@@ -53,17 +53,17 @@ char *get_asm_name(HashEntry *table_entry) {
     return name;
 }
 
-void write_add(FILE *asm_file, TacNode *print_node) {
-    if (print_node->res->datatype == DATATYPE_REAL) {
+void write_add(FILE *asm_file, TacNode *node) {
+    if (node->res->datatype == DATATYPE_REAL) {
         fprintf(asm_file, "\tmovss\t_%s(%%rip), %%xmm1\n"
                 "\tmovss\t_%s(%%rip), %%xmm0\n"
                 "\taddss\t%%xmm1, %%xmm0\n"
                 "\tmovss\t%%xmm0, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
-    } else if (print_node->res->datatype == DATATYPE_CHAR) {
+    } else if (node->res->datatype == DATATYPE_CHAR) {
         fprintf(asm_file, "\tmovzbl\t_%s(%%rip), %%eax\n"
                 "\tmovl\t%%eax, %%edx\n"
                 "\tmovzbl\t_%s(%%rip), %%eax\n"
@@ -71,33 +71,33 @@ void write_add(FILE *asm_file, TacNode *print_node) {
                 "\tmovl\t%%edx, %%eax\n"
                 "\taddl\t%%ecx, %%eax\n"
                 "\tmovb\t%%al, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
     } else {
             fprintf(asm_file, "\tmovl\t_%s(%%rip), %%edx\n"
                     "\tmovl\t_%s(%%rip), %%eax\n"
                     "\taddl\t%%eax, %%edx\n"
                     "\tmovl\t%%edx, _%s(%%rip)\n",
-                    get_asm_name(print_node->op1),
-                    get_asm_name(print_node->op2),
-                    get_asm_name(print_node->res)
+                    get_asm_name(node->op1),
+                    get_asm_name(node->op2),
+                    get_asm_name(node->res)
             );
     }
 }
 
-void write_sub(FILE *asm_file, TacNode *print_node) {
-    if (print_node->res->datatype == DATATYPE_REAL) {
+void write_sub(FILE *asm_file, TacNode *node) {
+    if (node->res->datatype == DATATYPE_REAL) {
         fprintf(asm_file, "\tmovss\t_%s(%%rip), %%xmm0\n"
                 "\tmovss\t_%s(%%rip), %%xmm1\n"
                 "\tsubss\t%%xmm1, %%xmm0\n"
                 "\tmovss\t%%xmm0, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
-    } else if (print_node->res->datatype == DATATYPE_CHAR) {
+    } else if (node->res->datatype == DATATYPE_CHAR) {
         fprintf(asm_file, "\tmovzbl\t_%s(%%rip), %%eax\n"
                 "\tmovl\t%%eax, %%edx\n"
                 "\tmovzbl\t_%s(%%rip), %%eax\n"
@@ -105,33 +105,33 @@ void write_sub(FILE *asm_file, TacNode *print_node) {
                 "\tmovl\t%%edx, %%eax\n"
                 "\tsubl\t%%ecx, %%eax\n"
                 "\tmovb\t%%al, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
     } else {
             fprintf(asm_file, "\tmovl\t_%s(%%rip), %%edx\n"
                     "\tmovl\t_%s(%%rip), %%eax\n"
                     "\tsubl\t%%eax, %%edx\n"
                     "\tmovl\t%%edx, _%s(%%rip)\n",
-                    get_asm_name(print_node->op1),
-                    get_asm_name(print_node->op2),
-                    get_asm_name(print_node->res)
+                    get_asm_name(node->op1),
+                    get_asm_name(node->op2),
+                    get_asm_name(node->res)
             );
     }
 }
 
-void write_mul(FILE *asm_file, TacNode *print_node) {
-    if (print_node->res->datatype == DATATYPE_REAL) {
+void write_mul(FILE *asm_file, TacNode *node) {
+    if (node->res->datatype == DATATYPE_REAL) {
         fprintf(asm_file, "\tmovss\t_%s(%%rip), %%xmm1\n"
                 "\tmovss\t_%s(%%rip), %%xmm0\n"
                 "\tmulss\t%%xmm1, %%xmm0\n"
                 "\tmovss\t%%xmm0, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
-    } else if (print_node->res->datatype == DATATYPE_CHAR) {
+    } else if (node->res->datatype == DATATYPE_CHAR) {
         fprintf(asm_file, "\tmovzbl\t_%s(%%rip), %%eax\n"
                 "\tmovl\t%%eax, %%ecx\n"
                 "\tmovzbl\t_%s(%%rip), %%eax\n"
@@ -139,33 +139,33 @@ void write_mul(FILE *asm_file, TacNode *print_node) {
                 "\tmovl\t%%ecx, %%eax\n"
                 "\timull\t%%edx, %%eax\n"
                 "\tmovb\t%%al, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
     } else {
             fprintf(asm_file, "\tmovl\t_%s(%%rip), %%edx\n"
                     "\tmovl\t_%s(%%rip), %%eax\n"
                     "\timull\t%%edx, %%eax\n"
                     "\tmovl\t%%eax, _%s(%%rip)\n",
-                    get_asm_name(print_node->op1),
-                    get_asm_name(print_node->op2),
-                    get_asm_name(print_node->res)
+                    get_asm_name(node->op1),
+                    get_asm_name(node->op2),
+                    get_asm_name(node->res)
             );
     }
 }
 
-void write_div(FILE *asm_file, TacNode *print_node) {
-    if (print_node->res->datatype == DATATYPE_REAL) {
+void write_div(FILE *asm_file, TacNode *node) {
+    if (node->res->datatype == DATATYPE_REAL) {
         fprintf(asm_file, "\tmovss\t_%s(%%rip), %%xmm0\n"
                 "\tmovss\t_%s(%%rip), %%xmm1\n"
                 "\tdivss\t%%xmm1, %%xmm0\n"
                 "\tmovss\t%%xmm0, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
-    } else if (print_node->res->datatype == DATATYPE_CHAR) {
+    } else if (node->res->datatype == DATATYPE_CHAR) {
         fprintf(asm_file, "\tmovzbl\t_%s(%%rip), %%eax\n"
                 "\tmovsbl\t%%al, %%eax\n"
                 "\tmovzbl\t_%s(%%rip), %%edx\n"
@@ -173,9 +173,9 @@ void write_div(FILE *asm_file, TacNode *print_node) {
                 "\tcltd"
                 "\tidivl\t%%esi\n"
                 "\tmovb\t%%al, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
     } else {
             fprintf(asm_file, "\tmovl\t_%s(%%rip), %%eax\n"
@@ -183,35 +183,35 @@ void write_div(FILE *asm_file, TacNode *print_node) {
                     "\tcltd\n"
                     "\tidivl\t%%ecx\n"
                     "\tmovl\t%%eax, _%s(%%rip)\n",
-                    get_asm_name(print_node->op1),
-                    get_asm_name(print_node->op2),
-                    get_asm_name(print_node->res)
+                    get_asm_name(node->op1),
+                    get_asm_name(node->op2),
+                    get_asm_name(node->res)
             );
     }
 }
 
-void write_less(FILE *asm_file, TacNode *print_node) {
-    if (print_node->res->datatype == DATATYPE_REAL) {
+void write_less(FILE *asm_file, TacNode *node) {
+    if (node->res->datatype == DATATYPE_REAL) {
         fprintf(asm_file, "\tmovss\t_%s(%%rip), %%xmm1\n"
                 "\tmovss\t_%s(%%rip), %%xmm0\n"
                 "\tcomiss\t%%xmm1, %%xmm0\n"
                 "\tseta\t%%al\n"
                 "\tmovzbl\t%%al, %%eax\n"
                 "\tmovl\t%%eax, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
-    } else if (print_node->res->datatype == DATATYPE_CHAR) {
+    } else if (node->res->datatype == DATATYPE_CHAR) {
         fprintf(asm_file, "\tmovzbl\t_%s(%%rip), %%edx\n"
                 "\tmovzbl\t_%s(%%rip), %%eax\n"
                 "\tcmpb\t%%al, %%dl\n"
                 "\tsetl\t%%al\n"
                 "\tmovzbl\t%%al, %%eax\n"
                 "\tmovl\t%%eax, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
     } else {
             fprintf(asm_file, "\tmovl\t_%s(%%rip), %%edx\n"
@@ -220,35 +220,35 @@ void write_less(FILE *asm_file, TacNode *print_node) {
                     "\tsetl\t%%al\n"
                     "\tmovzbl\t%%al, %%eax\n"
                     "\tmovl\t%%eax, _%s(%%rip)\n",
-                    get_asm_name(print_node->op1),
-                    get_asm_name(print_node->op2),
-                    get_asm_name(print_node->res)
+                    get_asm_name(node->op1),
+                    get_asm_name(node->op2),
+                    get_asm_name(node->res)
             );
     }
 }
 
-void write_greater(FILE *asm_file, TacNode *print_node) {
-    if (print_node->res->datatype == DATATYPE_REAL) {
+void write_greater(FILE *asm_file, TacNode *node) {
+    if (node->res->datatype == DATATYPE_REAL) {
         fprintf(asm_file, "\tmovss\t_%s(%%rip), %%xmm0\n"
                 "\tmovss\t_%s(%%rip), %%xmm1\n"
                 "\tcomiss\t%%xmm1, %%xmm0\n"
                 "\tseta\t%%al\n"
                 "\tmovzbl\t%%al, %%eax\n"
                 "\tmovl\t%%eax, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
-    } else if (print_node->res->datatype == DATATYPE_CHAR) {
+    } else if (node->res->datatype == DATATYPE_CHAR) {
         fprintf(asm_file, "\tmovzbl\t_%s(%%rip), %%edx\n"
                 "\tmovzbl\t_%s(%%rip), %%eax\n"
                 "\tcmpb\t%%al, %%dl\n"
                 "\tsetg\t%%al\n"
                 "\tmovzbl\t%%al, %%eax\n"
                 "\tmovl\t%%eax, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
     } else {
             fprintf(asm_file, "\tmovl\t_%s(%%rip), %%edx\n"
@@ -257,35 +257,35 @@ void write_greater(FILE *asm_file, TacNode *print_node) {
                     "\tsetg\t%%al\n"
                     "\tmovzbl\t%%al, %%eax\n"
                     "\tmovl\t%%eax, _%s(%%rip)\n",
-                    get_asm_name(print_node->op1),
-                    get_asm_name(print_node->op2),
-                    get_asm_name(print_node->res)
+                    get_asm_name(node->op1),
+                    get_asm_name(node->op2),
+                    get_asm_name(node->res)
             );
     }
 }
 
-void write_le(FILE *asm_file, TacNode *print_node) {
-    if (print_node->res->datatype == DATATYPE_REAL) {
+void write_le(FILE *asm_file, TacNode *node) {
+    if (node->res->datatype == DATATYPE_REAL) {
         fprintf(asm_file, "\tmovss\t_%s(%%rip), %%xmm1\n"
                 "\tmovss\t_%s(%%rip), %%xmm0\n"
                 "\tcomiss\t%%xmm1, %%xmm0\n"
                 "\tsetnb\t%%al\n"
                 "\tmovzbl\t%%al, %%eax\n"
                 "\tmovl\t%%eax, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
-    } else if (print_node->res->datatype == DATATYPE_CHAR) {
+    } else if (node->res->datatype == DATATYPE_CHAR) {
         fprintf(asm_file, "\tmovzbl\t_%s(%%rip), %%edx\n"
                 "\tmovzbl\t_%s(%%rip), %%eax\n"
                 "\tcmpb\t%%al, %%dl\n"
                 "\tsetle\t%%al\n"
                 "\tmovzbl\t%%al, %%eax\n"
                 "\tmovl\t%%eax, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
     } else {
             fprintf(asm_file, "\tmovl\t_%s(%%rip), %%edx\n"
@@ -294,35 +294,35 @@ void write_le(FILE *asm_file, TacNode *print_node) {
                     "\tsetle\t%%al\n"
                     "\tmovzbl\t%%al, %%eax\n"
                     "\tmovl\t%%eax, _%s(%%rip)\n",
-                    get_asm_name(print_node->op1),
-                    get_asm_name(print_node->op2),
-                    get_asm_name(print_node->res)
+                    get_asm_name(node->op1),
+                    get_asm_name(node->op2),
+                    get_asm_name(node->res)
             );
     }
 }
 
-void write_ge(FILE *asm_file, TacNode *print_node) {
-    if (print_node->res->datatype == DATATYPE_REAL) {
+void write_ge(FILE *asm_file, TacNode *node) {
+    if (node->res->datatype == DATATYPE_REAL) {
         fprintf(asm_file, "\tmovss\t_%s(%%rip), %%xmm0\n"
                 "\tmovss\t_%s(%%rip), %%xmm1\n"
                 "\tcomiss\t%%xmm1, %%xmm0\n"
                 "\tsetnb\t%%al\n"
                 "\tmovzbl\t%%al, %%eax\n"
                 "\tmovl\t%%eax, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
-    } else if (print_node->res->datatype == DATATYPE_CHAR) {
+    } else if (node->res->datatype == DATATYPE_CHAR) {
         fprintf(asm_file, "\tmovzbl\t_%s(%%rip), %%edx\n"
                 "\tmovzbl\t_%s(%%rip), %%eax\n"
                 "\tcmpb\t%%al, %%dl\n"
                 "\tsetge\t%%al\n"
                 "\tmovzbl\t%%al, %%eax\n"
                 "\tmovl\t%%eax, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
     } else {
             fprintf(asm_file, "\tmovl\t_%s(%%rip), %%edx\n"
@@ -331,15 +331,15 @@ void write_ge(FILE *asm_file, TacNode *print_node) {
                     "\tsetge\t%%al\n"
                     "\tmovzbl\t%%al, %%eax\n"
                     "\tmovl\t%%eax, _%s(%%rip)\n",
-                    get_asm_name(print_node->op1),
-                    get_asm_name(print_node->op2),
-                    get_asm_name(print_node->res)
+                    get_asm_name(node->op1),
+                    get_asm_name(node->op2),
+                    get_asm_name(node->res)
             );
     }
 }
 
-void write_eq(FILE *asm_file, TacNode *print_node) {
-    if (print_node->res->datatype == DATATYPE_REAL) {
+void write_eq(FILE *asm_file, TacNode *node) {
+    if (node->res->datatype == DATATYPE_REAL) {
         fprintf(asm_file, "\tmovss\t_%s(%%rip), %%xmm0\n"
                 "\tmovss\t_%s(%%rip), %%xmm1\n"
                 "\tucomiss\t%%xmm1, %%xmm0\n"
@@ -349,20 +349,20 @@ void write_eq(FILE *asm_file, TacNode *print_node) {
                 "\tcmovne\t%%edx, %%eax\n"
                 "\tmovzbl\t%%al, %%eax\n"
                 "\tmovl\t%%eax, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
-    } else if (print_node->res->datatype == DATATYPE_CHAR) {
+    } else if (node->res->datatype == DATATYPE_CHAR) {
         fprintf(asm_file, "\tmovzbl\t_%s(%%rip), %%edx\n"
                 "\tmovzbl\t_%s(%%rip), %%eax\n"
                 "\tcmpb\t%%al, %%dl\n"
                 "\tsete\t%%al\n"
                 "\tmovzbl\t%%al, %%eax\n"
                 "\tmovl\t%%eax, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
     } else {
             fprintf(asm_file, "\tmovl\t_%s(%%rip), %%edx\n"
@@ -371,15 +371,15 @@ void write_eq(FILE *asm_file, TacNode *print_node) {
                     "\tsete\t%%al\n"
                     "\tmovzbl\t%%al, %%eax\n"
                     "\tmovl\t%%eax, _%s(%%rip)\n",
-                    get_asm_name(print_node->op1),
-                    get_asm_name(print_node->op2),
-                    get_asm_name(print_node->res)
+                    get_asm_name(node->op1),
+                    get_asm_name(node->op2),
+                    get_asm_name(node->res)
             );
     }
 }
 
-void write_dif(FILE *asm_file, TacNode *print_node) {
-    if (print_node->res->datatype == DATATYPE_REAL) {
+void write_dif(FILE *asm_file, TacNode *node) {
+    if (node->res->datatype == DATATYPE_REAL) {
         fprintf(asm_file, "\tmovss\t_%s(%%rip), %%xmm0\n"
                 "\tmovss\t_%s(%%rip), %%xmm1\n"
                 "\tucomiss\t%%xmm1, %%xmm0\n"
@@ -389,20 +389,20 @@ void write_dif(FILE *asm_file, TacNode *print_node) {
                 "\tcmovne\t%%edx, %%eax\n"
                 "\tmovzbl\t%%al, %%eax\n"
                 "\tmovl\t%%eax, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
-    } else if (print_node->res->datatype == DATATYPE_CHAR) {
+    } else if (node->res->datatype == DATATYPE_CHAR) {
         fprintf(asm_file, "\tmovzbl\t_%s(%%rip), %%edx\n"
                 "\tmovzbl\t_%s(%%rip), %%eax\n"
                 "\tcmpb\t%%al, %%dl\n"
                 "\tsetne\t%%al\n"
                 "\tmovzbl\t%%al, %%eax\n"
                 "\tmovl\t%%eax, _%s(%%rip)\n",
-                get_asm_name(print_node->op1),
-                get_asm_name(print_node->op2),
-                get_asm_name(print_node->res)
+                get_asm_name(node->op1),
+                get_asm_name(node->op2),
+                get_asm_name(node->res)
         );
     } else {
             fprintf(asm_file, "\tmovl\t_%s(%%rip), %%edx\n"
@@ -411,21 +411,89 @@ void write_dif(FILE *asm_file, TacNode *print_node) {
                     "\tsetne\t%%al\n"
                     "\tmovzbl\t%%al, %%eax\n"
                     "\tmovl\t%%eax, _%s(%%rip)\n",
-                    get_asm_name(print_node->op1),
-                    get_asm_name(print_node->op2),
-                    get_asm_name(print_node->res)
+                    get_asm_name(node->op1),
+                    get_asm_name(node->op2),
+                    get_asm_name(node->res)
             );
     }
 }
 
-void write_printint(FILE *asm_file, TacNode *print_node) {
-    if (print_node->op1->datatype == DATATYPE_CHAR) {
+void write_and(FILE *asm_file, TacNode *node) {
+    HashEntry *label_1 = makeLabel();
+    HashEntry *label_2 = makeLabel();
+
+    fprintf(asm_file, "\tmovl\t_%s(%%rip), %%eax\n"
+            "\ttestl\t%%eax, %%eax\n"
+            "\tje\t_%s\n"
+            "\tmovl\t_%s(%%rip), %%eax\n"
+            "\ttestl\t%%eax, %%eax\n"
+            "\tje\t_%s\n"
+            "\tmovl\t$1, %%eax\n"
+            "\tjmp\t_%s\n"
+            "_%s:\n"
+            "\tmovl\t$0, %%eax\n"
+            "_%s:\n"
+            "\tmovl\t%%eax, _%s(%%rip)\n",
+            get_asm_name(node->op1),
+            get_asm_name(label_1),
+            get_asm_name(node->op2),
+            get_asm_name(label_1),
+            get_asm_name(label_2),
+            get_asm_name(label_1),
+            get_asm_name(label_2),
+            get_asm_name(node->res)
+    );
+}
+
+void write_or(FILE *asm_file, TacNode *node) {
+    HashEntry *label_1 = makeLabel();
+    HashEntry *label_2 = makeLabel();
+    HashEntry *label_3 = makeLabel();
+
+    fprintf(asm_file, "\tmovl\t_%s(%%rip), %%eax\n"
+            "\ttestl\t%%eax, %%eax\n"
+            "\tjne\t_%s\n"
+            "\tmovl\t_%s(%%rip), %%eax\n"
+            "\ttestl\t%%eax, %%eax\n"
+            "\tje\t_%s\n"
+            "_%s:\n"
+            "\tmovl\t$1, %%eax\n"
+            "\tjmp\t_%s\n"
+            "_%s:\n"
+            "\tmovl\t$0, %%eax\n"
+            "_%s:\n"
+            "\tmovl\t%%eax, _%s(%%rip)\n",
+            get_asm_name(node->op1),
+            get_asm_name(label_1),
+            get_asm_name(node->op2),
+            get_asm_name(label_2),
+            get_asm_name(label_1),
+            get_asm_name(label_3),
+            get_asm_name(label_2),
+            get_asm_name(label_3),
+            get_asm_name(node->res)
+    );
+}
+
+void write_not(FILE *asm_file, TacNode *node) {
+    fprintf(asm_file, "\tmovl\t_%s(%%rip), %%eax\n"
+            "\ttestl\t%%eax, %%eax\n"
+            "\tsete\t%%al\n"
+            "\tmovzbl\t%%al, %%eax\n"
+            "\tmovl\t%%eax, _%s(%%rip)\n",
+            get_asm_name(node->op1),
+            get_asm_name(node->res)
+    );
+}
+
+void write_printint(FILE *asm_file, TacNode *node) {
+    if (node->op1->datatype == DATATYPE_CHAR) {
         fprintf(asm_file, "\tmovzx\t_%s(%%rip), %%eax\n",
-                get_asm_name(print_node->op1)
+                get_asm_name(node->op1)
         );
     } else {
         fprintf(asm_file, "\tmovl\t_%s(%%rip), %%eax\n",
-                get_asm_name(print_node->op1)
+                get_asm_name(node->op1)
         );
     }
 
@@ -437,7 +505,7 @@ void write_printint(FILE *asm_file, TacNode *print_node) {
     );
 }
 
-void write_printfloat(FILE *asm_file, TacNode *print_node) {
+void write_printfloat(FILE *asm_file, TacNode *node) {
     fprintf(asm_file, "\tmovss\t_%s(%%rip), %%xmm0\n"
             "\tpxor\t%%xmm1, %%xmm1\n"
             "\tcvtss2sd\t%%xmm0, %%xmm1\n"
@@ -447,25 +515,25 @@ void write_printfloat(FILE *asm_file, TacNode *print_node) {
             "\tmovq\t%%rax, %%rdi\n"
             "\tmovl\t$1, %%eax\n"
             "\tcall\tprintf@PLT\n",
-            get_asm_name(print_node->op1)
+            get_asm_name(node->op1)
     );
 }
 
-void write_printchar(FILE *asm_file, TacNode *print_node) {
+void write_printchar(FILE *asm_file, TacNode *node) {
     fprintf(asm_file, "\tmovzbl\t_%s(%%rip), %%eax\n"
             "\tmovsbl\t%%al, %%eax\n"
             "\tmovl\t%%eax, %%edi\n"
             "\tcall\tputchar@PLT\n",
-            get_asm_name(print_node->op1)
+            get_asm_name(node->op1)
     );
 }
 
-void write_printstring(FILE *asm_file, TacNode *print_node) {
+void write_printstring(FILE *asm_file, TacNode *node) {
     fprintf(asm_file, "\tleaq\t_%s(%%rip), %%rax\n"
             "\tmovq\t%%rax, %%rdi\n"
             "\tmovl\t$0, %%eax\n"
             "\tcall\tprintf@PLT\n",
-            get_asm_name(print_node->op1)
+            get_asm_name(node->op1)
     );
 }
 
@@ -504,6 +572,15 @@ void write_instructions(FILE *asm_file, TacNode *tac_list) {
                 break;
             case TAC_DIF:
                 write_dif(asm_file, tac_list);
+                break;
+            case TAC_AND:
+                write_and(asm_file, tac_list);
+                break;
+            case TAC_OR:
+                write_or(asm_file, tac_list);
+                break;
+            case TAC_NOT:
+                write_not(asm_file, tac_list);
                 break;
             case TAC_BEGINFUN:
                 fprintf(asm_file, ".globl\t%s\n"
