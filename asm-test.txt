@@ -1,0 +1,13 @@
+char a:97;
+bool b:true;
+int number:'A';
+float f:2.5;
+
+int main () {
+    print char a;
+    print int a;
+    print bool b;
+    print int number;
+    print float f;
+    print int 3;
+}

@@ -3,6 +3,8 @@
 #include "hash.h"
 #include "asm.h"
 
+// Parte fixa
+
 void write_print_formats(FILE *asm_file) {
     fprintf(asm_file, "_printint:\n"
             "\t.string\t\"%%ld\"\n"
@@ -31,35 +33,74 @@ void write_bss_section(FILE *asm_file, AstNode *ast_tree) {
     write_temps(asm_file);
 }
 
-void write_printint(FILE *asm_file) {
-    fprintf(asm_file, "\tmovq\t%%rax, %%rsi\n"
+// Comandos
+
+char *get_asm_name(HashEntry *table_entry) {
+    char *name = NULL;
+
+    switch (table_entry->type) {
+        case SYMBOL_TEMP:
+        case SYMBOL_LABEL:
+        case SYMBOL_VARIABLE:
+        case SYMBOL_VECTOR:
+            name = table_entry->string;
+            break;
+        default:
+            name = table_entry->id;
+            break;
+    }
+
+    return name;
+}
+
+void write_printint(FILE *asm_file, TacNode *print_node) {
+    if (print_node->op1->datatype == DATATYPE_CHAR) {
+        fprintf(asm_file, "\tmovzx\t_%s(%%rip), %%eax\n",
+                get_asm_name(print_node->op1)
+        );
+    } else {
+        fprintf(asm_file, "\tmovl\t_%s(%%rip), %%eax\n",
+                get_asm_name(print_node->op1)
+        );
+    }
+
+    fprintf(asm_file, "\tmovl\t%%eax, %%esi\n"
             "\tleaq\t_printint(%%rip), %%rax\n"
             "\tmovq\t%%rax, %%rdi\n"
             "\tmovl\t$0, %%eax\n"
             "\tcall\tprintf@PLT\n"
-        );
+    );
 }
 
-void write_printfloat(FILE *asm_file) {
-    fprintf(asm_file, "\tmovq\t%%rax, %%xmm0\n"
+void write_printfloat(FILE *asm_file, TacNode *print_node) {
+    fprintf(asm_file, "\tmovss\t_%s(%%rip), %%xmm0\n"
+            "\tpxor\t%%xmm1, %%xmm1\n"
+            "\tcvtss2sd\t%%xmm0, %%xmm1\n"
+            "\tmovq\t%%xmm1, %%rax\n"
+            "\tmovq\t%%rax, %%xmm0\n"
             "\tleaq\t_printfloat(%%rip), %%rax\n"
             "\tmovq\t%%rax, %%rdi\n"
             "\tmovl\t$1, %%eax\n"
-            "\tcall\tprintf@PLT\n"
+            "\tcall\tprintf@PLT\n",
+            get_asm_name(print_node->op1)
     );
 }
 
-void write_printchar(FILE *asm_file) {
-    fprintf(asm_file, "\tmovl\t%%eax, %%edi\n"
-            "\tcall\tputchar@PLT\n"
-            "\tmovl\t$0, %%eax\n"
+void write_printchar(FILE *asm_file, TacNode *print_node) {
+    fprintf(asm_file, "\tmovzbl\t_%s(%%rip), %%eax\n"
+            "\tmovsbl\t%%al, %%eax\n"
+            "\tmovl\t%%eax, %%edi\n"
+            "\tcall\tputchar@PLT\n",
+            get_asm_name(print_node->op1)
     );
 }
 
-void write_printstring(FILE *asm_file) {
-    fprintf(asm_file, "\tmovq\t%%rax, %%rdi\n"
+void write_printstring(FILE *asm_file, TacNode *print_node) {
+    fprintf(asm_file, "\tleaq\t_%s(%%rip), %%rax\n"
+            "\tmovq\t%%rax, %%rdi\n"
             "\tmovl\t$0, %%eax\n"
-            "\tcall\tprintf@PLT\n"
+            "\tcall\tprintf@PLT\n",
+            get_asm_name(print_node->op1)
     );
 }
 
@@ -87,16 +128,16 @@ void write_instructions(FILE *asm_file, TacNode *tac_list) {
                 break;
             case TAC_PRINTINT:
             case TAC_PRINTBOOL:
-                write_printint(asm_file);
+                write_printint(asm_file, tac_list);
                 break;
             case TAC_PRINTFLOAT:
-                write_printfloat(asm_file);
+                write_printfloat(asm_file, tac_list);
                 break;
             case TAC_PRINTCHAR:
-                write_printchar(asm_file);
+                write_printchar(asm_file, tac_list);
                 break;
             case TAC_PRINTSTRING:
-                write_printstring(asm_file);
+                write_printstring(asm_file, tac_list);
                 break;
             default:
                 break;
