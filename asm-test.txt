@@ -1,14 +1,12 @@
+int i[5]: 1 2 3 4 5;
+float f[5]: 1. 2. 3. 4. 5.;
+char c[5]: 'A' 'B' 'C' 'D' 'E';
+
 int main () {
-    print bool true & false;
+    print int i[1];
     print "\n";
-    print bool true & true;
+    print float f[2];
     print "\n";
-    print bool true | false;
-    print "\n";
-    print bool false | false;
-    print "\n";
-    print bool ~false;
-    print "\n";
-    print bool ~true;
+    print char c[3];
     print "\n";
 }

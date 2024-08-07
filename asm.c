@@ -486,6 +486,49 @@ void write_not(FILE *asm_file, TacNode *node) {
     );
 }
 
+void write_vec_read(FILE *asm_file, TacNode *node) {
+    switch (node->op1->datatype) {
+        case DATATYPE_INT:
+        case DATATYPE_BOOL:
+            fprintf(asm_file, "\tmovl\t_%s(%%rip), %%eax\n"
+                    "\tcltq\n"
+                    "\tleaq\t0(,%%rax,4), %%rdx\n"
+                    "\tleaq\t_%s(%%rip), %%rax\n"
+                    "\tmovl\t(%%rdx,%%rax), %%eax\n"
+                    "\tmovl\t%%eax, _%s(%%rip)\n",
+                    get_asm_name(node->op2),
+                    get_asm_name(node->op1),
+                    get_asm_name(node->res)
+            );
+            break;
+        case DATATYPE_REAL:
+            fprintf(asm_file, "\tmovl\t_%s(%%rip), %%eax\n"
+                    "\tcltq\n"
+                    "\tleaq\t0(,%%rax,4), %%rdx\n"
+                    "\tleaq\t_%s(%%rip), %%rax\n"
+                    "\tmovss\t(%%rdx,%%rax), %%xmm0\n"
+                    "\tmovss\t%%xmm0, _%s(%%rip)\n",
+                    get_asm_name(node->op2),
+                    get_asm_name(node->op1),
+                    get_asm_name(node->res)
+            );
+            break;
+        case DATATYPE_CHAR:
+            fprintf(asm_file, "\tmovl\t_%s(%%rip), %%eax\n"
+                    "\tcltq\n"
+                    "\tleaq\t_%s(%%rip), %%rdx\n"
+                    "\tmovzbl\t(%%rax,%%rdx), %%eax\n"
+                    "\tmovb\t%%al, _%s(%%rip)\n",
+                    get_asm_name(node->op2),
+                    get_asm_name(node->op1),
+                    get_asm_name(node->res)
+            );
+            break;
+        default:
+            break;
+    }
+}
+
 void write_printint(FILE *asm_file, TacNode *node) {
     if (node->op1->datatype == DATATYPE_CHAR) {
         fprintf(asm_file, "\tmovzx\t_%s(%%rip), %%eax\n",
@@ -581,6 +624,9 @@ void write_instructions(FILE *asm_file, TacNode *tac_list) {
                 break;
             case TAC_NOT:
                 write_not(asm_file, tac_list);
+                break;
+            case TAC_VECREAD:
+                write_vec_read(asm_file, tac_list);
                 break;
             case TAC_BEGINFUN:
                 fprintf(asm_file, ".globl\t%s\n"

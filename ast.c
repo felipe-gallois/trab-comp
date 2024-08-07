@@ -255,9 +255,11 @@ void write_literal(FILE *asm_file, AstNode *literal) {
 }
 
 void write_literal_list(FILE *asm_file, AstNode *lit_list) {
-    fprintf(asm_file, "%s", lit_list->children[0]->symbol->string); 
+    write_literal(asm_file, lit_list->children[0]);
 
-    for (; lit_list->children[1] != NULL; lit_list = lit_list->children[1]) {
+    for (lit_list = lit_list->children[1];
+            lit_list != NULL;
+            lit_list = lit_list->children[1]) {
         fprintf(asm_file, ", ");
         write_literal(asm_file, lit_list->children[0]); 
     }
