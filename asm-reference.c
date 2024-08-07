@@ -1,18 +1,14 @@
-int a = 2;
-int b = 5;
 int res = 0;
-
-float c = 2.0;
-float d = 3.0;
-float fres = 0.0;
-
-char e = 'd';
-char f = 'h';
-char cres = 0;
+float a = 4;
+float b = 9;
+char c = 12;
+char d = 5;
+int e = 9;
+int f = 2;
 
 int main() {
-    fres = c - d;
-    cres = e - f;
-    res = a - b;
+    res = a != b;
+    res = c != d;
+    res = e != f;
 }
 
