@@ -1,13 +1,10 @@
-char a:97;
-bool b:true;
-int number:'A';
-float f:2.5;
-
 int main () {
-    print char a;
-    print int a;
-    print bool b;
-    print int number;
-    print float f;
-    print int 3;
+    print int 1 + 3;
+    print "\n";
+    print char 'B' - 1; 
+    print "\n";
+    print float 1.0 * 3.0;
+    print "\n";
+    print int 4 / 3;
+    print "\n";
 }

@@ -1,25 +1,18 @@
-#include <stdio.h>
+int a = 2;
+int b = 5;
+int res = 0;
 
-int w = 7;
-float x = 8.0f;
-char y = 'i';
+float c = 2.0;
+float d = 3.0;
+float fres = 0.0;
+
+char e = 'd';
+char f = 'h';
+char cres = 0;
 
 int main() {
-    // Impressão de literais
-    printf("%d", 1 + 2);
-    printf("%f", 2.0f + 3.0f);
-    printf("%c", 'c');
-    printf("def");
-
-    // Soma
-    w += 2;
-
-    // Impressão de variáveis
-    printf("%d", w);
-    printf("%f", x);
-    printf("%c", y);
+    fres = c - d;
+    cres = e - f;
+    res = a - b;
 }
 
-int a() { return 0; }
-float b() { return 0.0f; }
-char c() { return '\0'; }
