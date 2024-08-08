@@ -1,12 +1,30 @@
-int i[5]: 1 2 3 4 5;
-float f[5]: 1. 2. 3. 4. 5.;
-char c[5]: 'A' 'B' 'C' 'D' 'E';
+int ivar: 0;
+float fvar: 0.0;
+char cvar: 'a';
+
+int ivec[5];
+float fvec[5];
+char cvec[5]: 'a' 'a' 'a' 'a' 'a';
 
 int main () {
-    print int i[1];
+    ivar = 1;
+    fvar = 2.0;
+    cvar = 'c';
+
+    ivec[0] = 1;
+    fvec[1] = 2.0;
+    cvec[2] = 'c';
+
+    print int ivar;
     print "\n";
-    print float f[2];
+    print float fvar;
     print "\n";
-    print char c[3];
+    print char cvar;
+    print "\n";
+    print int ivec[0];
+    print "\n";
+    print float fvec[1];
+    print "\n";
+    print char cvec[2];
     print "\n";
 }

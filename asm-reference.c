@@ -1,18 +1,28 @@
-int vint[5] = {1, 2, 3, 4, 5};
-float vfloat[5] = {1.0, 2.0f, 3.0f, 4.0f, 5.0f};
-char vchar[5] = {'A', 'B', 'C', 'D', 'E'};
+#include <stdio.h>
 
-int intr = 0;
-float floatr = 0.0f;
-char charr = 0;
+int intvar[3] = { 0, 0, 0 };
+float floatvar[3] = { 1.0f, 1.0f, 1.0f };
+char charvar[3] = { 'a', 'a', 'a' };
 
-int a = 1;
-int b = 2;
-int c = 3;
+int a = 0;
+int b = 1;
+int c = 2;
+
+int d = 3;
+float e = 4.0f;
+char f = 'c';
+
+float res = 0.0f;
 
 int main() {
-    intr = vint[a];
-    floatr = vfloat[b];
-    charr = vchar[c];
+    intvar[a] = d;
+    floatvar[b] = e;
+    charvar[c] = f;
+
+    res = floatvar[b];
+
+    printf("%d\n", intvar[a]);
+    printf("%f\n", res);
+    printf("%c\n", charvar[c]);
 }
 

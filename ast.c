@@ -220,19 +220,21 @@ void write_vec_decl(FILE *asm_file, AstNode *tree) {
         declaration = tree->children[0];
 
         if (declaration->type == AST_VEC_DECL) {
+            fprintf(asm_file, "_%s:\n"
+                    "\t.zero\t",
+                    declaration->children[1]->symbol->string
+            );
             switch (declaration->children[1]->symbol->datatype) {
                 case DATATYPE_INT:
                 case DATATYPE_REAL:
                 case DATATYPE_BOOL:
                     fprintf(asm_file,
-                            ".comm\t_%s, %d\n",
-                            declaration->children[1]->symbol->string,
+                            "%d\n",
                             4 * atoi(declaration->children[2]->symbol->string));
                     break;
                 case DATATYPE_CHAR:
                     fprintf(asm_file,
-                            ".comm\t_%s, %d\n",
-                            declaration->children[1]->symbol->string,
+                            "%d\n",
                             atoi(declaration->children[2]->symbol->string));
                     break;
                 default:
@@ -301,3 +303,4 @@ void write_vec_decl_def(FILE *asm_file, AstNode *tree) {
         tree = tree->children[1];
     }
 }
+

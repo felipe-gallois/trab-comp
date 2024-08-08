@@ -16,6 +16,13 @@ AUX1 = $(SRC1:.c=.h)
 
 BIN = etapa6
 
+INPUT = asm-test.txt
+OUTPUT = output.txt
+ASM = assembly.s
+
+TEST_OUT = test-out
+PRINT_OUT = test-print
+
 $(BIN): $(OBJS)
 	$(CC) -o $(BIN) $(OBJS)
 	
@@ -24,6 +31,12 @@ lex.yy.c: scanner.l
 
 y.tab.c: parser.y
 	yacc -d parser.y
+
+.PHONY: test
+test:
+	./$(BIN) $(INPUT) $(OUTPUT)
+	$(CC) -o $(TEST_OUT) $(CFLAGS) $(ASM)
+	./$(TEST_OUT) > $(PRINT_OUT)
 
 .PHONY: clean
 clean:

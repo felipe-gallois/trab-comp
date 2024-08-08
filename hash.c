@@ -152,6 +152,10 @@ void write_temps(FILE *asm_file) {
     for (int i = 0; i < HASH_SIZE; i++) {
         for (HashEntry *entry = table[i]; entry; entry = entry->next) {
             if (entry->type == SYMBOL_TEMP) {
+                fprintf(asm_file, "_%s:\n"
+                        "\t.zero\t",
+                        entry->string
+                );
                 switch (entry->datatype) {
                     case DATATYPE_INT:
                     case DATATYPE_REAL:
@@ -167,8 +171,7 @@ void write_temps(FILE *asm_file) {
                 }
 
                 fprintf(asm_file,
-                        ".comm\t_%s, %d\n",
-                        entry->string,
+                        "%d\n",
                         size);
             }
         }
