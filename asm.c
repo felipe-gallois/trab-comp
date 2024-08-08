@@ -703,6 +703,23 @@ void write_read(FILE *asm_file, TacNode *node) {
     }
 }
 
+void write_ifz(FILE *asm_file, TacNode *node) {
+    fprintf(asm_file, "\tmovl\t_%s(%%rip), %%eax\n"
+            "\ttestl\t%%eax, %%eax\n"
+            "\tje\t_%s\n",
+            get_asm_name(node->op1),
+            get_asm_name(node->res)
+    );
+}
+
+void write_label(FILE *asm_file, TacNode *node) {
+    fprintf(asm_file, "_%s:\n", get_asm_name(node->res));
+}
+
+void write_jump(FILE *asm_file, TacNode *node) {
+    fprintf(asm_file, "\tjmp\t_%s\n", get_asm_name(node->res));
+}
+
 void write_instructions(FILE *asm_file, TacNode *tac_list) {
     fprintf(asm_file, "## INSTRUCTIONS\n"
             ".text\n");
@@ -772,6 +789,15 @@ void write_instructions(FILE *asm_file, TacNode *tac_list) {
                 break;
             case TAC_READ:
                 write_read(asm_file, tac_list);
+                break;
+            case TAC_IFZ:
+                write_ifz(asm_file, tac_list);
+                break;
+            case TAC_JUMP:
+                write_jump(asm_file, tac_list);
+                break;
+            case TAC_LABEL:
+                write_label(asm_file, tac_list);
                 break;
             case TAC_BEGINFUN:
                 fprintf(asm_file, ".globl\t%s\n"

@@ -1,16 +1,23 @@
-int a: 0;
-float b: 0.0;
-char c: 'a';
+bool a: true;
+int b: 5;
 
 int main () {
-    read int a;
-    read float b;
-    read char c;
+    if (a) {
+        print "Entrei no loop\n";
+    } else {
+        print "Nao entrei no loop\n";
+    }
 
-    print int a;
-    print "\n";
-    print float b;
-    print "\n";
-    print char c;
-    print "\n";
+    a = ~a;
+
+    if (a) {
+        print "Entrei no loop\n";
+    } else {
+        print "Nao entrei no loop\n";
+    }
+
+    while (b > 0) {
+        print "Estou no while\n";
+        b = b - 1;
+    }
 }
