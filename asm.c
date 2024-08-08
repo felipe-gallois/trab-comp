@@ -9,7 +9,9 @@ void write_print_formats(FILE *asm_file) {
     fprintf(asm_file, "_printint:\n"
             "\t.string\t\"%%ld\"\n"
             "_printfloat:\n"
-            "\t.string\t\"%%f\"\n");
+            "\t.string\t\"%%f\"\n"
+            "_printchar:\n"
+            "\t.string\t\"%%c\"\n");
 }
 
 void write_read_only(FILE *asm_file) {
@@ -652,6 +654,55 @@ void write_printstring(FILE *asm_file, TacNode *node) {
     );
 }
 
+void write_read(FILE *asm_file, TacNode *node) {
+    HashEntry *label = NULL;
+
+    switch (node->res->datatype) {
+        case DATATYPE_INT:
+        case DATATYPE_BOOL:
+            fprintf(asm_file, "\tleaq\t_%s(%%rip), %%rax\n"
+                    "\tmovq\t%%rax, %%rsi\n"
+                    "\tleaq\t_printint(%%rip), %%rax\n"
+                    "\tmovq\t%%rax, %%rdi\n"
+                    "\tmovl\t$0, %%eax\n"
+                    "\tcall\t__isoc99_scanf@PLT\n",
+                    get_asm_name(node->res)
+            );
+            break;
+        case DATATYPE_REAL:
+            fprintf(asm_file, "\tleaq\t_%s(%%rip), %%rax\n"
+                    "\tmovq\t%%rax, %%rsi\n"
+                    "\tleaq\t_printfloat(%%rip), %%rax\n"
+                    "\tmovq\t%%rax, %%rdi\n"
+                    "\tmovl\t$0, %%eax\n"
+                    "\tcall\t__isoc99_scanf@PLT\n",
+                    get_asm_name(node->res)
+            );
+            break;
+        case DATATYPE_CHAR:
+            label = makeLabel();
+
+            fprintf(asm_file, "\tnop\n"
+                    "_%s:\n"
+                    "\tcall\tgetchar@PLT\n"
+                    "\tcmpl\t$10,\t%%eax\n"
+                    "\tjne\t_%s\n"
+                    "\tleaq\t_%s(%%rip), %%rax\n"
+                    "\tmovq\t%%rax, %%rsi\n"
+                    "\tleaq\t_printchar(%%rip), %%rax\n"
+                    "\tmovq\t%%rax, %%rdi\n"
+                    "\tmovl\t$0, %%eax\n"
+                    "\tcall\t__isoc99_scanf@PLT\n",
+                    get_asm_name(label),
+                    get_asm_name(label),
+                    get_asm_name(node->res)
+            );
+            break;
+        default:
+            break;
+    }
+}
+
 void write_instructions(FILE *asm_file, TacNode *tac_list) {
     fprintf(asm_file, "## INSTRUCTIONS\n"
             ".text\n");
@@ -718,6 +769,9 @@ void write_instructions(FILE *asm_file, TacNode *tac_list) {
                 break;
             case TAC_PRINTSTRING:
                 write_printstring(asm_file, tac_list);
+                break;
+            case TAC_READ:
+                write_read(asm_file, tac_list);
                 break;
             case TAC_BEGINFUN:
                 fprintf(asm_file, ".globl\t%s\n"

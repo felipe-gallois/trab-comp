@@ -1,28 +1,19 @@
 #include <stdio.h>
 
-int intvar[3] = { 0, 0, 0 };
-float floatvar[3] = { 1.0f, 1.0f, 1.0f };
-char charvar[3] = { 'a', 'a', 'a' };
-
 int a = 0;
-int b = 1;
-int c = 2;
-
-int d = 3;
-float e = 4.0f;
-char f = 'c';
-
-float res = 0.0f;
+float b = 0.0f;
+char c = 'a';
 
 int main() {
-    intvar[a] = d;
-    floatvar[b] = e;
-    charvar[c] = f;
+    scanf("%d", &a);
 
-    res = floatvar[b];
+    scanf("%f", &b);
 
-    printf("%d\n", intvar[a]);
-    printf("%f\n", res);
-    printf("%c\n", charvar[c]);
+    while (getchar() != '\n');
+    scanf("%c", &c);
+
+    printf("%d\n", a);
+    printf("%f\n", b);
+    printf("%c\n", c);
 }
 
