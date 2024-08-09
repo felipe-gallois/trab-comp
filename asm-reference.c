@@ -1,16 +1,15 @@
 #include <stdio.h>
 
-int a = 1;
+int a = 365;
+int b = 45;
 
-void f(int a) {
-    if (a) {
-        printf("Sim\n");
-    } else {
-        printf("Nao\n");
-    }
-}
+char c = 'a';
+char d = 'b';
 
 int main() {
-    f(a);
+    printf("%d\n", (int) (a + b));
+    printf("%d\n", (int) (a + d));
+    printf("%d\n", (int) (c + b));
+    printf("%d\n", (int) (c + d));
 }
 

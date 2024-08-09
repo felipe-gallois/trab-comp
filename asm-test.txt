@@ -1,36 +1,52 @@
 int a: 0;
-int b: 1;
-int c: 2;
+char b: 2;
+char c: 'a';
 
-float d: 0.0;
-float e: 1.0;
-float f: 2.0;
-
-char g: '0';
-char h: 35;
-char i: 36;
+int vector[3]: 1 2 3;
 
 int main () {
-    a = ifunc(b, c);
-    d = ffunc(e, f);
-    g = cfunc(h, i);
+    print int a + b;
+    print "\n";
+    print int a - b;
+    print "\n";
+    print int a * b;
+    print "\n";
+    print int a / b;
+    print "\n";
+    print bool a < b;
+    print "\n";
+    print bool a > b;
+    print "\n";
+    print bool a <= b;
+    print "\n";
+    print bool a >= b;
+    print "\n";
+    print bool a == b;
+    print "\n";
+    print bool a != b;
+    print "\n";
+    print int vector[b];
+    print "\n";
+    print int f(b);
+    print "\n";
 
+    a = b;
     print int a;
     print "\n";
-    print float d;
+
+    vector[b] = b; 
+    print int vector[b];
     print "\n";
-    print char g;
+ 
+    print int g(c);
     print "\n";
 }
 
-int ifunc(int ix, int iy) {
-    return ix + iy;
+int f(int x) {
+    return x;
 }
 
-float ffunc(float fx, float fy) {
-    return fx + fy;
+int g(char y) {
+    return y;
 }
 
-char cfunc(char cx, char cy) {
-    return cx + cy;
-}
