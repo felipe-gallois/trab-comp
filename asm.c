@@ -801,6 +801,15 @@ void write_beginfun(FILE *asm_file, TacNode *node) {
     );
 }
 
+void write_endfun(FILE *asm_file, TacNode *node, HashEntry *current_func) {
+    if (strcmp(node->res->string, "main") == 0) {
+        fprintf(asm_file, "\tmovl\t$0, %%eax\n"
+                "\tpopq\t%%rbp\n"
+                "\tret\n"
+        );
+    }
+}
+
 void write_instructions(FILE *asm_file, TacNode *tac_list) {
     HashEntry *current_func = NULL;
 
@@ -894,6 +903,10 @@ void write_instructions(FILE *asm_file, TacNode *tac_list) {
             case TAC_BEGINFUN:
                 current_func = tac_list->res;
                 write_beginfun(asm_file, tac_list);
+                break;
+            case TAC_ENDFUN:
+                current_func = NULL;
+                write_endfun(asm_file, tac_list, current_func);
                 break;
             default:
                 break;

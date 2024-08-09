@@ -21,8 +21,6 @@ int main () {
     print "\n";
     print char g;
     print "\n";
-
-    return 0;
 }
 
 int ifunc(int ix, int iy) {
