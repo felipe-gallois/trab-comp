@@ -304,3 +304,42 @@ void write_vec_decl_def(FILE *asm_file, AstNode *tree) {
     }
 }
 
+void write_parameters(FILE *asm_file, AstNode *tree) {
+    AstNode *declaration;
+    AstNode *param_list;
+    HashEntry *param_symbol;
+
+    while (tree != NULL) {
+        declaration = tree->children[0];
+
+        if (declaration->type == AST_FUNC_DECL) {
+            param_list = declaration->children[2]; 
+
+            while (param_list != NULL) {
+                param_symbol = param_list->children[0]->children[1]->symbol;
+                
+                fprintf(asm_file, "_%s:\n"
+                        "\t.zero\t",
+                        param_symbol->string
+                );
+                switch (param_symbol->datatype) {
+                    case DATATYPE_INT:
+                    case DATATYPE_REAL:
+                    case DATATYPE_BOOL:
+                        fprintf(asm_file, "4\n");
+                        break;
+                    case DATATYPE_CHAR:
+                        fprintf(asm_file, "1\n");
+                        break;
+                    default:
+                        break;
+                }
+
+                param_list = param_list->children[1];
+            }
+        }
+
+        tree = tree->children[1];
+    }
+}
+

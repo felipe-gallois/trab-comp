@@ -41,6 +41,7 @@ typedef struct HashEntry {
     enum DataType datatype;
     unsigned long capacity;
     TypeList *parameters;
+    struct HashEntry *out_temp;
     char id[16];
     char *string;
     struct HashEntry *next;

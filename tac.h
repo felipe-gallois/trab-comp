@@ -49,6 +49,8 @@ typedef struct TacNode {
 } TacNode;
 
 TacNode *generate_code(AstNode *node);
+void bind_parameters(AstNode *ast_root, TacNode *tac_list);
+void bind_return_output(TacNode *tac_list);
 TacNode *tac_reverse_list(TacNode *list);
 void tac_print(TacNode *list);
 

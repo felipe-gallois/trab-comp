@@ -1,10 +1,16 @@
 #include <stdio.h>
 
-int a = 0;
+int a = 1;
+
+void f(int a) {
+    if (a) {
+        printf("Sim\n");
+    } else {
+        printf("Nao\n");
+    }
+}
 
 int main() {
-    if (a) {
-        printf("Hello\n");
-    }
+    f(a);
 }
 

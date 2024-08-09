@@ -72,4 +72,6 @@ void write_vec_decl(FILE *asm_file, AstNode *tree);
 
 void write_vec_decl_def(FILE *asm_file, AstNode *tree);
 
+void write_parameters(FILE *asm_file, AstNode *tree);
+
 #endif

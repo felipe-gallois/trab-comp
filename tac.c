@@ -63,6 +63,8 @@ TacNode *tac_create(enum TacType type, HashEntry *res, HashEntry *op1,
                     HashEntry *op2);
 TacNode *tac_join(TacNode *list1, TacNode *list_2);
 
+AstNode *find_param_list(AstNode *ast_root, HashEntry *symbol);
+
 TacNode *generate_code(AstNode *node) {
     TacNode *children_code[MAX_CHILDREN];
     TacNode *result = NULL;
@@ -125,7 +127,6 @@ TacNode *generate_code(AstNode *node) {
         case AST_ARGS_LIST:
             result = node->children[0] ? generate_arg(children_code) : NULL;
             break;
-        // TODO: AST_LIT_LIST
         case AST_VAR_ATTRIB:
             result = generate_move(children_code);
             break;
@@ -168,11 +169,9 @@ TacNode *generate_code(AstNode *node) {
         case AST_WHILE:
             result = generate_while(children_code);
             break;
-        // TODO: AST_PARAM, AST_PARAM_LIST
         case AST_FUNC_DECL:
             result = generate_func_decl(children_code);
             break;
-        // TODO: AST_VEC_DECL .. AST_VAR_DECL
         default:
             result = generate_default(children_code);
             break;
@@ -215,9 +214,18 @@ TacNode *generate_vec_exp(enum DataType datatype, TacNode *children_code[]) {
 }
 
 TacNode *generate_func_exp(enum DataType datatype, TacNode *children_code[]) {
+    HashEntry *temp;
+
+    if (children_code[0]->res->out_temp == NULL) {
+        temp = makeTemp(datatype);
+        children_code[0]->res->out_temp = temp;
+    } else {
+        temp = children_code[0]->res->out_temp;
+    }
+
     TacNode *result = tac_create(
             TAC_CALL,
-            makeTemp(datatype),
+            temp,
             children_code[0] ? children_code[0]->res : NULL,
             NULL
     );
@@ -228,8 +236,8 @@ TacNode *generate_func_exp(enum DataType datatype, TacNode *children_code[]) {
 TacNode *generate_arg(TacNode *children_code[]) {
     TacNode *result = tac_create(
             TAC_ARG,
-            children_code[0] ? children_code[0]->res : NULL,
             NULL,
+            children_code[0] ? children_code[0]->res : NULL,
             NULL
     );
 
@@ -273,8 +281,8 @@ TacNode *generate_vec_attrib(TacNode *children_code[]) {
 TacNode *generate_return(TacNode *children_code[]) {
     TacNode *result = tac_create(
             TAC_RET,
-            children_code[0] ? children_code[0]->res : NULL,
             NULL,
+            children_code[0] ? children_code[0]->res : NULL,
             NULL
     );
 
@@ -466,6 +474,56 @@ TacNode *generate_default(TacNode *children_code[]) {
     return result;
 }
 
+void bind_parameters(AstNode *ast_root, TacNode *tac_list) {
+    AstNode *param_list = NULL;
+    TacNode *unassigned_arg = NULL;
+
+    while (tac_list != NULL) {
+        if (tac_list->type == TAC_ARG) {
+            if (param_list != NULL) {
+                tac_list->res = param_list->children[0]->children[1]->symbol;
+                param_list = param_list->children[1];
+                unassigned_arg = NULL;
+            } else if (unassigned_arg == NULL) {
+                unassigned_arg = tac_list;
+            }
+        } else if (tac_list->type == TAC_CALL) {
+            if (unassigned_arg != NULL) {
+                param_list = find_param_list(ast_root, tac_list->op1);
+                tac_list = unassigned_arg;
+                continue;
+            }
+        }
+
+        tac_list = tac_list->neigh;
+    }
+
+    if (unassigned_arg != NULL)
+        fprintf(stderr, "Assembly error: couldn't match arguments to parameters\n");
+}
+
+void bind_return_output(TacNode *tac_list) {
+    HashEntry *current_temp = NULL;
+
+    while (tac_list != NULL) {
+        switch (tac_list->type) {
+            case TAC_BEGINFUN:
+                current_temp = tac_list->res->out_temp;
+                break;
+            case TAC_ENDFUN:
+                current_temp = NULL;
+                break;
+            case TAC_RET:
+                tac_list->res = current_temp;
+                break;
+            default:
+                break;
+        }
+
+        tac_list = tac_list->neigh;
+    }
+}
+
 TacNode *tac_create(enum TacType type, HashEntry *res, HashEntry *op1,
         HashEntry *op2) {
     TacNode *new_node = (TacNode*) malloc(sizeof(TacNode));
@@ -541,3 +599,20 @@ enum DataType normalize_datatype(enum DataType datatype) {
 
     return datatype;
 }
+
+AstNode *find_param_list(AstNode *ast_root, HashEntry *symbol) {
+    AstNode *declaration;
+
+    while (ast_root != NULL) {
+        declaration = ast_root->children[0];    
+
+        if (declaration->type == AST_FUNC_DECL && declaration->children[1]->symbol == symbol) {
+            return declaration->children[2]; 
+        }
+
+        ast_root = ast_root->children[1];
+    }
+
+    return NULL;
+}
+

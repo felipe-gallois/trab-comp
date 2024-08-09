@@ -43,7 +43,10 @@ int main(int argc, char** argv) {
     if (semantic_errors > 0)
         exit(4);
 
-    tac_list = tac_reverse_list(generate_code(ast_root)); 
+    tac_list = generate_code(ast_root); 
+    tac_list = tac_reverse_list(tac_list);
+    bind_parameters(ast_root, tac_list);
+    bind_return_output(tac_list);
     tac_print(tac_list);
     enumerate_literals();
     print_hash();

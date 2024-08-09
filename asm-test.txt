@@ -1,23 +1,38 @@
-bool a: true;
-int b: 5;
+int a: 0;
+int b: 1;
+int c: 2;
+
+float d: 0.0;
+float e: 1.0;
+float f: 2.0;
+
+char g: '0';
+char h: 35;
+char i: 36;
 
 int main () {
-    if (a) {
-        print "Entrei no loop\n";
-    } else {
-        print "Nao entrei no loop\n";
-    }
+    a = ifunc(b, c);
+    d = ffunc(e, f);
+    g = cfunc(h, i);
 
-    a = ~a;
+    print int a;
+    print "\n";
+    print float d;
+    print "\n";
+    print char g;
+    print "\n";
 
-    if (a) {
-        print "Entrei no loop\n";
-    } else {
-        print "Nao entrei no loop\n";
-    }
+    return 0;
+}
 
-    while (b > 0) {
-        print "Estou no while\n";
-        b = b - 1;
-    }
+int ifunc(int ix, int iy) {
+    return ix + iy;
+}
+
+float ffunc(float fx, float fy) {
+    return fx + fy;
+}
+
+char cfunc(char cx, char cy) {
+    return cx + cy;
 }

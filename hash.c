@@ -43,6 +43,7 @@ HashEntry *insert_entry(char *string, enum SymbolType type, enum DataType dataty
     new_entry->datatype = datatype;
     new_entry->capacity = 0;
     new_entry->parameters = NULL;
+    new_entry->out_temp = NULL;
     new_entry->string = (char*) malloc((strlen(string) + 1)
                                        * sizeof(HashEntry));
     strcpy(new_entry->string, string);
