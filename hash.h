@@ -54,6 +54,7 @@ HashEntry *insert_entry(char *string, enum SymbolType type, enum DataType dataty
 HashEntry *makeTemp(enum DataType datatype);
 HashEntry *makeLabel();
 void enumerate_literals();
+void generate_function_temps();
 void write_literals(FILE *asm_file);
 void write_temps(FILE *asm_file);
 void print_hash();

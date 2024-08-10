@@ -737,8 +737,6 @@ void write_printstring(FILE *asm_file, TacNode *node) {
 }
 
 void write_read(FILE *asm_file, TacNode *node) {
-    HashEntry *label = NULL;
-
     switch (node->res->datatype) {
         case DATATYPE_INT:
         case DATATYPE_BOOL:
@@ -762,21 +760,12 @@ void write_read(FILE *asm_file, TacNode *node) {
             );
             break;
         case DATATYPE_CHAR:
-            label = makeLabel();
-
-            fprintf(asm_file, "\tnop\n"
-                    "_%s:\n"
-                    "\tcall\tgetchar@PLT\n"
-                    "\tcmpl\t$10,\t%%eax\n"
-                    "\tjne\t_%s\n"
-                    "\tleaq\t_%s(%%rip), %%rax\n"
+            fprintf(asm_file, "\tleaq\t_%s(%%rip), %%rax\n"
                     "\tmovq\t%%rax, %%rsi\n"
                     "\tleaq\t_printchar(%%rip), %%rax\n"
                     "\tmovq\t%%rax, %%rdi\n"
                     "\tmovl\t$0, %%eax\n"
                     "\tcall\t__isoc99_scanf@PLT\n",
-                    get_asm_name(label),
-                    get_asm_name(label),
                     get_asm_name(node->res)
             );
             break;

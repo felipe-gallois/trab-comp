@@ -118,6 +118,16 @@ void enumerate_literals() {
     }
 }
 
+void generate_function_temps() {
+    for (int i = 0; i < HASH_SIZE; i++) {
+        for (HashEntry *entry = table[i]; entry; entry = entry->next) {
+            if (entry->type == SYMBOL_FUNCTION) {
+                entry->out_temp = makeTemp(entry->datatype);
+            }
+        }
+    }
+}
+
 void write_literals(FILE *asm_file) {
     for (int i = 0; i < HASH_SIZE; i++) {
         for (HashEntry *entry = table[i]; entry; entry = entry->next) {

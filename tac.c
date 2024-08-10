@@ -214,18 +214,9 @@ TacNode *generate_vec_exp(enum DataType datatype, TacNode *children_code[]) {
 }
 
 TacNode *generate_func_exp(enum DataType datatype, TacNode *children_code[]) {
-    HashEntry *temp;
-
-    if (children_code[0]->res->out_temp == NULL) {
-        temp = makeTemp(datatype);
-        children_code[0]->res->out_temp = temp;
-    } else {
-        temp = children_code[0]->res->out_temp;
-    }
-
     TacNode *result = tac_create(
             TAC_CALL,
-            temp,
+            children_code[0]->res->out_temp,
             children_code[0] ? children_code[0]->res : NULL,
             NULL
     );
