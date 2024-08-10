@@ -40,4 +40,4 @@ test:
 
 .PHONY: clean
 clean:
-	rm $(OBJS) $(SRC1) $(AUX1) $(BIN)
+	rm $(OBJS) $(SRC1) $(AUX1) *.s *.out
