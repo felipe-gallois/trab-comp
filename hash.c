@@ -48,7 +48,15 @@ HashEntry *insert_entry(char *string, enum SymbolType type, enum DataType dataty
                                        * sizeof(HashEntry));
     strcpy(new_entry->string, string);
     new_entry->next = NULL;
-    table[address] = new_entry;
+
+    if (table[address] == NULL) {
+        table[address] = new_entry;
+    } else {
+        HashEntry *entry = table[address];
+        for (; entry->next != NULL; entry = entry->next);
+        entry->next = new_entry;
+    }
+
     return new_entry;
 }
 
