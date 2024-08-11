@@ -1,0 +1,23 @@
+int pos: 0;
+int fibnum[10];
+
+int main() {
+    print "Vamos calcular os primeiros 10 numeros de Fibonacci:\n";
+    
+    fibnum[0] = 1;
+    fibnum[1] = 1;
+
+    pos = 2;
+    while (pos < 10) {
+        fibnum[pos] = fibnum[pos - 1] + fibnum[pos - 2]; 
+        pos = pos + 1;
+    }
+
+    pos = 0;
+    while (pos < 10) {
+        print int fibnum[pos];
+        print "\n";
+        pos = pos + 1;
+    }
+}
+

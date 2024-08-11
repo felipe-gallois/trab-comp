@@ -1,0 +1,45 @@
+float a: 0.0;
+float b: 0.0;
+float c: 0.0;
+
+float asquare: 0.0;
+float bsquare: 0.0;
+float csquare: 0.0;
+
+int main() {
+    print "Qual a medida do lado a?\n";
+    read float a;
+
+    print "Qual a medida do lado b?\n";
+    read float b;
+
+    print "Qual a medida do lado c?\n";
+    read float c;
+
+    if (istriangle(a, b, c)) {
+        print "Eh um triangulo\n";
+
+        if (isrighttriangle(a, b, c)) {
+            print "Eh triangulo retangulo\n";
+        } else {
+            print "Nao eh triangulo retangulo\n";
+        }
+    } else {
+        print "Nao eh um triangulo\n";
+    }
+}
+
+bool istriangle(float u, float v, float w) {
+    return (a > 0.0) & (b > 0.0) & (c > 0.0)
+           & (a < b + c) & (b < a + c) & (c < a + b);
+}
+
+bool isrighttriangle(float x, float y, float z) {
+    asquare = a * a;
+    bsquare = b * b;
+    csquare = c * c;
+
+    return (asquare == bsquare + csquare)
+           | (bsquare == asquare + csquare)
+           | (csquare == asquare + bsquare);
+}
