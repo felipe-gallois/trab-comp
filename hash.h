@@ -55,6 +55,7 @@ HashEntry *makeTemp(enum DataType datatype);
 HashEntry *makeLabel();
 void enumerate_literals();
 void generate_function_temps();
+void delete_temp(HashEntry *temp);
 void write_literals(FILE *asm_file);
 void write_temps(FILE *asm_file);
 void print_hash();

@@ -136,6 +136,19 @@ void generate_function_temps() {
     }
 }
 
+void delete_temp(HashEntry *temp) {
+    int hash = get_address(temp->string);
+
+    for (HashEntry **entry = &table[hash]; *entry != NULL; *entry = (*entry)->next) {
+        if (*entry == temp) {
+            HashEntry *next = (*entry)->next;
+            free(*entry);
+            *entry = next;
+            break;
+        }
+    }
+}
+
 void write_literals(FILE *asm_file) {
     for (int i = 0; i < HASH_SIZE; i++) {
         for (HashEntry *entry = table[i]; entry; entry = entry->next) {

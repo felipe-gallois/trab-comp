@@ -584,6 +584,23 @@ void tac_print(TacNode *list) {
     }
 }
 
+void delete_tac(TacNode *list, TacNode *tac) {
+    TacNode *prev = NULL;
+    TacNode *current = list;
+
+    while (current != NULL) {
+        if (current == tac) {
+            TacNode *next = current->neigh;
+            free(current);
+            prev->neigh = next;
+            break;
+        }
+
+        prev = current;
+        current = current->neigh;
+    }
+}
+
 enum DataType normalize_datatype(enum DataType datatype) {
     if (datatype == DATATYPE_CHAR)
         return DATATYPE_INT;
