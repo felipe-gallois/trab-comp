@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     tac_list = tac_reverse_list(tac_list);
     bind_parameters(ast_root, tac_list);
     bind_return_output(tac_list);
-    optimize_common_subexpr(tac_list);
+    make_common_subexpr_optimization(tac_list);
     tac_print(tac_list);
     enumerate_literals();
     print_hash();

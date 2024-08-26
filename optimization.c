@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
+#include <math.h>
 
 #include "optimization.h"
 
@@ -85,15 +87,15 @@ int is_subexpr(TacNode *tac) {
     return 0;
 }
 
-int count_subexprs(TacNode *tac_list) {
+int count_subexprs(TacNode *tac_node, TacNode *expr_end) {
     int count = 0;
 
-    while (tac_list != NULL) {
-        if (is_subexpr(tac_list)) {
+    while (tac_node != expr_end->neigh) {
+        if (is_subexpr(tac_node)) {
             count++;
         }
 
-        tac_list = tac_list->neigh;
+        tac_node = tac_node->neigh;
     }
 
     // DEBUG
@@ -303,18 +305,18 @@ int is_alias(VarListDescr *list, VarTableNode **table, char *name) {
     return 0;
 }
 
-void optimize_common_subexpr(TacNode *tac_list) {
+void optimize_common_subexpr(TacNode *expr_start, TacNode *expr_end) {
     TacNode *tac_node;
     TacNode *prev_node;
 
-    int num_subexprs = count_subexprs(tac_list);
+    int num_subexprs = count_subexprs(expr_start, expr_end);
     VarListDescr *vars_list = create_list(num_subexprs);     
 
     VarTableNode **var_table = create_table(TABLE_SIZE);
 
-    tac_node = tac_list;
+    tac_node = expr_start;
 
-    while (tac_node != NULL) {
+    while (tac_node != expr_end->neigh) {
         if (is_symbol(tac_node)) {
             process_symbol(vars_list, var_table, tac_node);
         } else if (is_unary_subexpr(tac_node)) {
@@ -326,16 +328,16 @@ void optimize_common_subexpr(TacNode *tac_list) {
         tac_node = tac_node->neigh;
     }
 
-    tac_node = tac_list;
+    tac_node = expr_start;
 
-    while (tac_node != NULL) {
+    while (tac_node != expr_end->neigh) {
         int index;
         prev_node = tac_node;
         tac_node = tac_node->neigh;
 
         if (prev_node->res != NULL && is_alias(vars_list, var_table, prev_node->res->string)) {
             delete_temp(prev_node->res);
-            delete_tac(tac_list, prev_node);  
+            delete_tac(expr_start, prev_node);  
             continue;
         }
 
@@ -363,4 +365,111 @@ void optimize_common_subexpr(TacNode *tac_list) {
 
     destroy_list(vars_list);
     destroy_table(var_table, TABLE_SIZE);
+}
+
+int is_expr(TacNode *node) {
+    switch (node->type) {
+        case TAC_MOVE:
+        case TAC_VECMOVE:
+        case TAC_PRINTINT:
+        case TAC_PRINTFLOAT:
+        case TAC_PRINTBOOL:
+        case TAC_PRINTCHAR:
+        case TAC_RET:
+        case TAC_IFZ:
+            return 1;
+            break;
+        default:
+            return 0;
+            break;
+    }
+}
+
+int find_index(TacNode *tac_list, TacNode *node) {
+    int count = -1;
+
+    while (tac_list != NULL) {
+        count++;
+
+        if (tac_list == node) {
+            return count;
+        }
+
+        tac_list = tac_list->neigh;
+    }
+
+    return count;
+}
+
+int find_hash_index(TacNode *tac_list, HashEntry *hash, int max_index) {
+    int index = 0;
+    int last_found = -1;
+
+    while (index <= max_index) {
+        if (tac_list->res == hash) {
+            last_found = index;
+        }
+
+        tac_list = tac_list->neigh;
+        index++;
+    }
+
+    return last_found;
+}
+
+int find_expr_start_index(TacNode *tac_list, TacNode *expr_end, int max_index) {
+    if (expr_end == NULL)
+        return INT_MAX;
+
+    if (is_symbol(expr_end)) {
+        return find_index(tac_list, expr_end);
+    }
+
+    if (is_unary_subexpr(expr_end) || (is_expr(expr_end) && expr_end->type != TAC_VECMOVE)) {
+        int op_index = find_hash_index(tac_list, expr_end->op1, max_index);
+        TacNode *op_node = tac_list;
+        for (int i = 0; i < op_index; i++) {
+            op_node = op_node->neigh; 
+        }
+        return find_expr_start_index(tac_list, op_node, op_index);
+    }
+
+    if (is_binary_subexpr(expr_end) || (is_expr(expr_end) && expr_end->type == TAC_VECMOVE)) {
+        int op1_index = find_hash_index(tac_list, expr_end->op1, max_index);
+        int op2_index = find_hash_index(tac_list, expr_end->op2, max_index);
+
+        if (op1_index < op2_index) {
+            TacNode *op1_node = tac_list;
+            for (int i = 0; i < op1_index; i++) {
+                op1_node = op1_node->neigh; 
+            }
+            return find_expr_start_index(tac_list, op1_node, op1_index);
+        } else {
+            TacNode *op2_node = tac_list;
+            for (int i = 0; i < op2_index; i++) {
+                op2_node = op2_node->neigh; 
+            }
+            return find_expr_start_index(tac_list, op2_node, op2_index);
+        }
+    }
+
+    return INT_MAX;
+}
+
+void make_common_subexpr_optimization(TacNode *tac_list) {
+    TacNode *node = tac_list;
+    
+    while (node != NULL) {
+        if (is_expr(node)) {
+            int node_index = find_index(tac_list, node);
+            int expr_start_index = find_expr_start_index(tac_list, node, node_index);
+            TacNode *expr_start = tac_list;
+            for (int i = 0; i < expr_start_index; i++) {
+                expr_start = expr_start->neigh;
+            }
+            optimize_common_subexpr(expr_start, node);
+        }
+
+        node = node->neigh;
+    }
 }

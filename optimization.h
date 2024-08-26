@@ -3,6 +3,6 @@
 
 #include "tac.h"
 
-void optimize_common_subexpr(TacNode *tac_list);
+void make_common_subexpr_optimization(TacNode *tac_list);
 
 #endif
