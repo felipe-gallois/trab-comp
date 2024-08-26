@@ -57,6 +57,17 @@ int is_binary_subexpr(TacNode *tac) {
 
     switch (tac->type) {
         case TAC_ADD:
+        case TAC_SUB:
+        case TAC_MUL:
+        case TAC_DIV:
+        case TAC_LESS:
+        case TAC_GREATER:
+        case TAC_LE:
+        case TAC_GE:
+        case TAC_EQ:
+        case TAC_DIF:
+        case TAC_AND:
+        case TAC_OR:
             is_binary_subexpr = 1;
             break;
         default:
@@ -280,6 +291,9 @@ void process_binary_subexpr(VarListDescr *list, VarTableNode **table, TacNode *t
 int is_alias(VarListDescr *list, VarTableNode **table, char *name) {
     int index = search_index(table, name); 
 
+    if (index < 0)
+        return 0;
+
     VarListNode node = list->start[index];
 
     if (strcmp(node.symbol->string, name) != 0) {
@@ -319,32 +333,30 @@ void optimize_common_subexpr(TacNode *tac_list) {
         prev_node = tac_node;
         tac_node = tac_node->neigh;
 
-        if (is_subexpr(prev_node)) {
-            if (is_alias(vars_list, var_table, prev_node->res->string)) {
-                delete_temp(prev_node->res);
-                delete_tac(tac_list, prev_node);  
-                continue;
-            }
+        if (prev_node->res != NULL && is_alias(vars_list, var_table, prev_node->res->string)) {
+            delete_temp(prev_node->res);
+            delete_tac(tac_list, prev_node);  
+            continue;
+        }
 
-            if (prev_node->op1 != NULL) {
-                index = search_index(var_table, prev_node->op1->string);
-                if (index >= 0) {
-                    prev_node->op1 = vars_list->start[index].symbol;
-                }
+        if (prev_node->op1 != NULL) {
+            index = search_index(var_table, prev_node->op1->string);
+            if (index >= 0) {
+                prev_node->op1 = vars_list->start[index].symbol;
             }
+        }
 
-            if (prev_node->op2 != NULL) {
-                index = search_index(var_table, prev_node->op2->string);
-                if (index >= 0) {
-                    prev_node->op2 = vars_list->start[index].symbol;
-                }
+        if (prev_node->op2 != NULL) {
+            index = search_index(var_table, prev_node->op2->string);
+            if (index >= 0) {
+                prev_node->op2 = vars_list->start[index].symbol;
             }
+        }
 
-            if (prev_node->res != NULL) {
-                index = search_index(var_table, prev_node->res->string);
-                if (index >= 0) {
-                    prev_node->res = vars_list->start[index].symbol;
-                }
+        if (prev_node->res != NULL) {
+            index = search_index(var_table, prev_node->res->string);
+            if (index >= 0) {
+                prev_node->res = vars_list->start[index].symbol;
             }
         }
     }
